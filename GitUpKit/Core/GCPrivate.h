@@ -33,6 +33,24 @@
 
 #import "XLFacilityMacros.h"
 
+// TODO - Get this merged into GNUstep's NSObjCRuntime.h
+// From https://clang.llvm.org/docs/AutomaticReferenceCounting.html#interior-pointers:
+/// An Objective-C method returning a non-retainable pointer may be annotated with 
+/// this macro to indicate that it returns a handle to the internal data of an 
+/// object, and that this reference will be invalidated if the object is destroyed. 
+/// When such a message is sent to an object, the object’s lifetime will be extended 
+/// until at least the earliest of:
+/// * the last use of the returned pointer, or any pointer derived from it, in 
+///   the calling function or
+/// * the autorelease pool is restored to a previous state.
+#ifndef NS_RETURNS_INNER_POINTER
+#if __has_attribute(objc_returns_inner_pointer)
+#define NS_RETURNS_INNER_POINTER __attribute__((objc_returns_inner_pointer))
+#else
+#define NS_RETURNS_INNER_POINTER
+#endif
+#endif
+
 #define kRefsNamespace "refs/"
 #define kTagsNamespace "refs/tags/"
 #define kHeadsNamespace "refs/heads/"
@@ -86,6 +104,9 @@ static inline NSString* GetLastGitErrorMessage() {
     CHECK_LIBGIT2_FUNCTION_CALL(goto __GOTO_LABEL__, __callError, == GIT_OK); \
   } while (0)
 
+/// Check __STATUS__ __COMPARISON__. If not true, then raise an error with
+/// status __STATUS__ and message based on the value of ``errno``, then do
+/// __FAIL_ACTION__
 #define CHECK_POSIX_FUNCTION_CALL(__FAIL_ACTION__, __STATUS__, __COMPARISON__)                 \
   do {                                                                                         \
     if (!(__STATUS__ __COMPARISON__)) {                                                        \

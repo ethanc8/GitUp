@@ -31,6 +31,11 @@
 static const char* _GitLFSPath = "/usr/local/bin/git-lfs";
 #endif
 
+#if TARGET_OS_LINUX
+#include <sys/syscall.h>      /* Definition of SYS_* constants */
+#include <unistd.h> // syscall
+#endif
+
 static inline BOOL _IsDirectoryWritable(const char* path) {
   int status = access(path, W_OK);
   if (status == 0) {
@@ -113,7 +118,12 @@ static int _GitLFSApply(git_filter* self, void** payload, git_buf* to, const git
 
 // We can't guarantee XLFacility has been initialized yet as +load method can be called in arbitrary order
 + (void)load {
+  // For other platforms, see https://stackoverflow.com/a/4868757
+  #if TARGET_OS_MAC || TARGET_OS_FREEBSD || TARGET_OS_OPENBSD || TARGET_OS_BSD
   assert(pthread_main_np() > 0);
+  #elif TARGET_OS_LINUX
+  assert(syscall(SYS_gettid) == getpid());
+  #endif
 
   assert(git_libgit2_features() & GIT_FEATURE_THREADS);
   assert(git_libgit2_features() & GIT_FEATURE_HTTPS);
@@ -309,7 +319,8 @@ static int _ReferenceForEachCallback(const char* refname, void* payload) {
   NSString* hooksPath = [[self readConfigOptionForVariable:@"core.hooksPath" error:NULL] value];
   if (hooksPath.length > 0) {
     hooksPath = hooksPath.stringByExpandingTildeInPath;
-    if (!hooksPath.absolutePath) {
+    // TODO - Get -NSString.absolutePath = -[NSString isAbsolutePath] merged into GNUstep
+    if (![hooksPath isAbsolutePath]) {
       hooksPath = [self.workingDirectoryPath stringByAppendingPathComponent:hooksPath];
     }
   } else {

@@ -18,7 +18,23 @@
 #endif
 
 #import <objc/runtime.h>
-#import <CommonCrypto/CommonDigest.h>
+#if __has_include(<CommonCrypto/CommonDigest.h>)
+  #define HAS_COMMONCRYPTO 1
+  #import <CommonCrypto/CommonDigest.h>
+#else
+  // TODO - Don't use deprecated functions.
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+  #include <openssl/md5.h>
+  #define HAS_COMMONCRYPTO 0
+  
+  #define CC_MD5_CTX MD5_CTX
+  #define CC_MD5_DIGEST_LENGTH MD5_DIGEST_LENGTH
+  #define CC_MD5_Init MD5_Init
+  #define CC_MD5_Update MD5_Update
+  #define CC_MD5_Final MD5_Final
+  // In CC this is uint32_t
+  typedef size_t CC_LONG;
+#endif
 
 #import "GCPrivate.h"
 
@@ -534,7 +550,7 @@ static const void* _associatedObjectUpstreamNameKey = &_associatedObjectUpstream
       XLOG_DEBUG_CHECK(sizeof(git_time_t) == sizeof(int64_t));
 
       // Find newest (respectively oldest) skipped commit(s)
-      git_time_t boundaryTime = _followParents ? LONG_LONG_MIN : LONG_LONG_MAX;
+      git_time_t boundaryTime = _followParents ? LLONG_MIN : LLONG_MAX;
       GC_POINTER_LIST_FOR_LOOP(row, GCHistoryCommit*, timeCommit) {
         git_time_t time = git_commit_time(timeCommit.private);
         if (time == boundaryTime) {

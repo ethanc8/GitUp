@@ -17,11 +17,39 @@
 #error This file requires ARC
 #endif
 
+#import <TargetConditionals.h>
+#import "XLFacilityMacros.h"
+
+#if TARGET_OS_MAC
 #import <copyfile.h>
 #import <sys/attr.h>
+#endif
+
+#import <sys/time.h> // utimes
 #import <sys/stat.h>
 
 #import "GCPrivate.h"
+
+// TODO - Contribute this upstream
+// TODO - Test this
+#if GNUSTEP
+@interface NSRegularExpression(GCIndex)
++ (NSString *)escapedPatternForString:(NSString *)string;
+@end
+@implementation NSRegularExpression(GCIndex)
++ (NSString *)escapedPatternForString:(NSString *)string {
+  return [[NSRegularExpression 
+    regularExpressionWithPattern: @"([*?+\\[(){}^$|\\\\.])" 
+                         options: 0 
+                           error: NULL]
+    stringByReplacingMatchesInString: string
+                             options: 0
+                               range: NSMakeRange(0, [string length]) 
+                        withTemplate: @"\\\\$1"
+  ];
+}
+@end
+#endif
 
 // libgit2 SPI
 extern void git_index_entry__init_from_stat(git_index_entry* entry, struct stat* st, bool trust_mode);
@@ -581,11 +609,51 @@ cleanup:
   close(fd);
   fd = -1;
 
+  // https://keith.github.io/xcode-man-pages/copyfile.3.html
   // Copy file metadata onto the temporary copy
+  // This includes access control lists, extended attributes, 
+  // and POSIX information (mode, modification time, etc.).
+  // Follows symlinks
+  #if TARGET_OS_MAC
   copyfile_state_t state = copyfile_state_alloc();
   int copyStatus = copyfile(fullPath, tempPath, state, COPYFILE_METADATA);
   copyfile_state_free(state);
   CHECK_POSIX_FUNCTION_CALL(goto cleanup, copyStatus, == 0);
+  #elif TARGET_OS_LINUX
+  // On Linux, ACLs are stored as extended attributes, so
+  // we don't need special handling for them.
+  // See https://www.usenix.org/legacy/publications/library/proceedings/usenix03/tech/freenix03/full_papers/gruenbacher/gruenbacher_html/main.html
+
+  // TODO - Make this reusable in other code.
+
+  // Get file information of the file at fullPath
+  struct stat fullStat;
+  // TODO - Handle errors.
+  // TODO - Test this code.
+  int statStatus = stat(fullPath, &fullStat);
+  CHECK_POSIX_FUNCTION_CALL(goto cleanup, statStatus, == 0);
+  // Copy owner. This is likely to fail if not running as root.
+  int chownStatus = chown(tempPath, fullStat.st_uid, fullStat.st_gid);
+  CHECK_POSIX_FUNCTION_CALL(XLOG_ERROR(@"Couldn't set owner of file at %s", tempPath), chownStatus, == 0);
+
+  // Copy permissions (mode).
+  int chmodStatus = chmod(tempPath, fullStat.st_mode);
+  CHECK_POSIX_FUNCTION_CALL(XLOG_ERROR(@"Couldn't set permissions of file at %s", tempPath), chmodStatus, == 0);
+
+  // Copy times.
+  const struct timespec times[2] = {
+    fullStat.st_atim, // Access time
+    fullStat.st_mtim, // Modification time
+  };
+  int utimensatStatus = utimensat(AT_FDCWD, fullPath, times, 0);
+  CHECK_POSIX_FUNCTION_CALL(XLOG_ERROR(@"Couldn't set access and modification time of file at %s", tempPath), utimensatStatus, == 0);
+  // TODO - Copy extended attributes.
+
+
+
+  #else
+  #error "Don't know how to copy file metadata
+  #endif
 
   // Swap temporary copy and original file
   int exchangeStatus = GCExchangeFileData(tempPath, fullPath);

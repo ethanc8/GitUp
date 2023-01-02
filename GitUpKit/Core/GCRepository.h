@@ -53,7 +53,15 @@ typedef NS_ENUM(NSUInteger, GCFileMode) {
 
 @interface GCRepository : NSObject
 @property(nonatomic, weak) id<GCRepositoryDelegate> delegate;
+/// Get the path of this repository
+/// 
+/// This is the path of the `.git` folder for normal repositories,
+/// or of the repository itself for bare repositories
 @property(nonatomic, readonly) NSString* repositoryPath;
+/// Get the path of the working directory for this repository
+///
+/// If the repository is bare, this will always return
+/// NULL.
 @property(nonatomic, readonly) NSString* workingDirectoryPath;  // nil for a bare repository
 @property(nonatomic, readonly, getter=isReadOnly) BOOL readOnly;
 @property(nonatomic, readonly, getter=isBare) BOOL bare;

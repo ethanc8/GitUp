@@ -21,6 +21,11 @@
 
 #define kMaxReferenceNestingLevels 10  // Same as MAX_NESTING_LEVEL in libgit2 source
 
+// Declare this so we can use respondsToSelector: @selector(localizedStandardCompare:)
+@interface NSString()
+- (NSComparisonResult)localizedStandardCompare:(NSString *)string;
+@end
+
 @implementation GCReference {
   __unsafe_unretained GCRepository* _repository;
 }
@@ -76,7 +81,11 @@
 }
 
 - (NSComparisonResult)nameCompare:(GCReference*)reference {
-  return [_name localizedStandardCompare:reference->_name];
+  if ([_name respondsToSelector:@selector(localizedStandardCompare:)]) {
+    return [_name localizedStandardCompare:reference->_name];
+  } else {
+    return [_name localizedCaseInsensitiveCompare:reference->_name];
+  }
 }
 
 @end

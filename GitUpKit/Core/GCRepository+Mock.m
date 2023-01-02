@@ -224,7 +224,11 @@ cleanup:
 
     [array addObject:string];
   }
-  return [[array sortedArrayUsingSelector:@selector(localizedStandardCompare:)] componentsJoinedByString:@" "];
+  if ([NSString instancesRespondToSelector:@selector(localizedStandardCompare:)]) {
+    return [[array sortedArrayUsingSelector:@selector(localizedStandardCompare:)] componentsJoinedByString:@" "];
+  } else {
+    return [[array sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] componentsJoinedByString:@" "];
+  }
 }
 
 // TODO: Should we optimize this?

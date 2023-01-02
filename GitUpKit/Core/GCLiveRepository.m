@@ -18,7 +18,23 @@
 #endif
 
 #import <sys/stat.h>
+#import <TargetConditionals.h>
+#if TARGET_OS_MAC
+#define USE_FSEVENTS 1
+#define USE_INOTIFY 0
+#elif TARGET_OS_LINUX
+#define USE_FSEVENTS 0
+#define USE_INOTIFY 1
+#else
+#error "GCLiveRepository not implemented for your platform."
+#endif
+
+#if USE_FSEVENTS
 #import <sys/attr.h>
+#elif USE_INOTIFY
+#import <sys/inotify.h>
+#import <dispatch/dispatch.h>
+#endif
 
 #if DEBUG
 #import <stdatomic.h>
@@ -43,6 +59,9 @@
 
 #define kMinSearchLength 2  // SQLite FTS indexes tokens down to a single characters but it's just impractical to allow that in the UI
 
+#define kInotifyModifications (IN_ATTRIB | IN_CREATE | IN_DELETE | IN_DELETE_SELF \
+  | IN_MODIFY | IN_MOVE_SELF | IN_MOVED_FROM | IN_MOVED_TO)
+
 NSString* const GCLiveRepositoryDidChangeNotification = @"GCLiveRepositoryDidChangeNotification";
 NSString* const GCLiveRepositoryWorkingDirectoryDidChangeNotification = @"GCLiveRepositoryWorkingDirectoryDidChangeNotification";
 
@@ -60,11 +79,23 @@ NSString* const GCLiveRepositoryAmendOperationReason = @"amend";
 static _Atomic int32_t _allocatedCount = ATOMIC_VAR_INIT(0);
 #endif
 
+/// File descriptor
+typedef int GCFileDescriptor;
+
 @implementation GCLiveRepository {
-  int _gitDirectory;
+  GCFileDescriptor _gitDirectory;
+  #if USE_FSEVENTS
   FSEventStreamRef _gitDirectoryStream;
-  BOOL _gitDirectoryChanged;
   FSEventStreamRef _workingDirectoryStream;
+  #elif USE_INOTIFY
+  GCFileDescriptor _inotifyEventQueue;
+  GCFileDescriptor _gitDirectoryWatchDescriptor;
+  GCFileDescriptor _workingDirectoryWatchDescriptor;
+  BOOL _isMonitoringWorkingDirectory;
+  dispatch_io_t _inotifyIOChannel;
+  BOOL _shouldKeepReadingFromInotifyEventQueue;
+  #endif
+  BOOL _gitDirectoryChanged;
   BOOL _workingDirectoryChanged;
   CFRunLoopTimerRef _updateTimer;  // Can't use a NSTimer because of retain-cycle
   GCRepositoryState _state;
@@ -124,6 +155,7 @@ static void _TimerCallBack(CFRunLoopTimerRef timer, void* info) {
   }
 }
 
+#if USE_FSEVENTS
 - (void)_stream:(ConstFSEventStreamRef)stream didReceiveEvents:(size_t)numEvents withPaths:(void*)eventPaths flags:(const FSEventStreamEventFlags*)eventFlags {
   for (size_t i = 0; i < numEvents; ++i) {
     const char* path = ((const char**)eventPaths)[i];
@@ -174,8 +206,10 @@ static void _StreamCallback(ConstFSEventStreamRef streamRef, void* clientCallBac
     [(__bridge GCLiveRepository*)clientCallBackInfo _stream:streamRef didReceiveEvents:numEvents withPaths:eventPaths flags:eventFlags];
   }
 }
+#endif // USE_FSEVENTS
 
 - (void)_reloadWorkingDirectoryStream {
+  #if USE_FSEVENTS
   if (_workingDirectoryStream) {
     FSEventStreamStop(_workingDirectoryStream);
     FSEventStreamInvalidate(_workingDirectoryStream);
@@ -197,6 +231,20 @@ static void _StreamCallback(ConstFSEventStreamRef streamRef, void* clientCallBac
       XLOG_ERROR(@"Failed creating event stream at \"%@\"", path);
     }
   }
+  #elif USE_INOTIFY
+  if(_isMonitoringWorkingDirectory) {
+    inotify_rm_watch(_workingDirectoryWatchDescriptor, _inotifyEventQueue);
+    _isMonitoringWorkingDirectory = NO;
+  }
+  NSString* path = self.workingDirectoryPath;  // nil for bare repositories
+  if (path) {
+    _workingDirectoryWatchDescriptor = inotify_add_watch(_inotifyEventQueue, [path UTF8String], IN_ALL_EVENTS);
+    if(_workingDirectoryWatchDescriptor == -1) {
+      XLOG_ERROR(@"Failed starting inotify watch at \"%@\": %s", path, strerror(errno));
+    }
+    _isMonitoringWorkingDirectory = YES;
+  }
+  #endif
 }
 
 - (instancetype)initWithRepository:(git_repository*)repository error:(NSError**)error {
@@ -214,27 +262,179 @@ static void _StreamCallback(ConstFSEventStreamRef streamRef, void* clientCallBac
     }
     XLOG_VERBOSE(@"History loaded for \"%@\" (%lu commits scanned in %.3f seconds)", self.repositoryPath, _history.allCommits.count, CFAbsoluteTimeGetCurrent() - time);
 
+    /// This is the path of the `.git` folder for normal repositories,
+    /// or of the repository itself for bare repositories
     NSString* path = self.repositoryPath;
     _gitDirectory = open(path.fileSystemRepresentation, O_RDONLY);  // Don't use O_EVTONLY as we do want to prevent unmounting the volume that contains the directory
     CHECK_POSIX_FUNCTION_CALL(return nil, _gitDirectory, >= 0);
 
-    CFRunLoopTimerContext context = {0, (__bridge void*)self, NULL, NULL, NULL};
-    _updateTimer = CFRunLoopTimerCreate(kCFAllocatorDefault, HUGE_VALF, HUGE_VALF, 0, 0, _TimerCallBack, &context);
+    CFRunLoopTimerContext context = {
+      .version = 0, 
+      .info = (__bridge void*)self, 
+      .retain = NULL, 
+      .release = NULL, 
+      .copyDescription = NULL};
+    // Create a timer that will never fire by itself and will fire infinitely many seconds
+    // after it first fires. When it fires, it will call _TimerCallBack
+    _updateTimer = CFRunLoopTimerCreate(
+      kCFAllocatorDefault, // allocator
+      HUGE_VALF, // first fire date = infinity
+      HUGE_VALF, // firing interval = infinity
+      0, 0, // ignored
+      _TimerCallBack, // callback
+      &context); // context
+    // Add the timer to the main loop in the common modes.
     CFRunLoopAddTimer(CFRunLoopGetMain(), _updateTimer, kCFRunLoopCommonModes);
 
+    #if USE_FSEVENTS
     FSEventStreamContext streamContext = {0, (__bridge void*)self, NULL, NULL, NULL};
-    _gitDirectoryStream = FSEventStreamCreate(kCFAllocatorDefault, _StreamCallback, &streamContext,
-                                              (__bridge CFArrayRef) @[ path ], kFSEventStreamEventIdSinceNow,
-                                              kFSLatency, kFSEventStreamCreateFlagIgnoreSelf);  // This opens the path
+    // Create a per-host event stream
+    _gitDirectoryStream = FSEventStreamCreate(kCFAllocatorDefault, // allocator
+                                              _StreamCallback, // callback
+                                              &streamContext, // context
+                                              (__bridge CFArrayRef) @[ path ], // paths to watch = repository path
+                                              kFSEventStreamEventIdSinceNow, // since when = since now
+                                              kFSLatency, // latency (seconds)
+                                              kFSEventStreamCreateFlagIgnoreSelf // flags = Don't send events that were triggered by the current process.
+                                             );  // This opens the path
     if (_gitDirectoryStream == NULL) {
       XLOG_ERROR(@"Failed creating event stream at \"%@\"", path);
       return nil;
     }
+    // Schedule the event stream on the main loop
     FSEventStreamScheduleWithRunLoop(_gitDirectoryStream, CFRunLoopGetMain(), kCFRunLoopCommonModes);
     if (!FSEventStreamStart(_gitDirectoryStream)) {
       XLOG_ERROR(@"Failed starting event stream at \"%@\"", path);
       return nil;
     }
+    #elif USE_INOTIFY
+    // Create an inotify event queue.
+    _inotifyEventQueue = inotify_init();
+    CHECK_POSIX_FUNCTION_CALL(
+      XLOG_ERROR(@"Failed starting inotify event queue"); return nil, 
+      _inotifyEventQueue, != -1);
+    // Watch the repository path.
+    _gitDirectoryWatchDescriptor = inotify_add_watch(_inotifyEventQueue, [path UTF8String], IN_ALL_EVENTS);
+    CHECK_POSIX_FUNCTION_CALL(
+      XLOG_ERROR(@"Failed starting inotify watch at \"%@\"", path); return nil, 
+      _gitDirectoryWatchDescriptor, != -1);
+
+    // TODO - Test this!
+
+
+    // We can use dispatch_io_read to get callbacks when new data is written
+    // to the inotify event queue, and then use dispatch_data_create_map to
+    // get a pointer to the data. Then we can cast the data to (struct inotify_event*)
+    // and process it.
+
+    // See:
+    // * [Processing a File using GCD](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/TechniquesforReadingandWritingCustomFiles/TechniquesforReadingandWritingCustomFiles.html#//apple_ref/doc/uid/TP40010672-CH5-SW8)
+    // * [Using GCD on macOS](https://apple.github.io/swift-corelibs-libdispatch/tutorial/)
+    // * [Concurrency Programming Guide](https://developer.apple.com/library/archive/documentation/General/Conceptual/ConcurrencyProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40008091-CH1-SW1)
+
+    // Create the GCD I/O channel with the inotify event queue
+    _inotifyIOChannel = dispatch_io_create(
+      DISPATCH_IO_STREAM, // Use a stream, just like in normal usage
+      _inotifyEventQueue, // file descriptor
+      dispatch_get_main_queue(), // queue
+      ^(int error){ // cleanup handler
+        if(error) {
+          XLOG_ERROR(@"Error creating GCD I/O channel: %s\n", strerror(error));
+        }
+        dispatch_release(_inotifyIOChannel);
+        _inotifyIOChannel = NULL;
+      });
+
+    dispatch_io_handler_t eventCallback;
+    dispatch_io_handler_t __block __weak weakEventCallback;
+    weakEventCallback = eventCallback = ^(bool done, dispatch_data_t data, int error) {
+      if(error == 0 && self->_shouldKeepReadingFromInotifyEventQueue) {
+        // Get the actual data.
+        __block const struct inotify_event* event;
+        size_t eventSize;
+
+        (void) dispatch_data_create_map(data, (const void**)&event, &eventSize);
+        // We only read the rest of the data, not the name.
+        XLOG_CHECK(eventSize == sizeof(struct inotify_event));
+        
+        // Read the name.
+        if(event->len > 0) {
+          dispatch_io_read(
+            _inotifyIOChannel, // channel
+            0, // offset (ignored)
+            event->len, // length = event->len
+            dispatch_get_main_queue(), // queue = main queue
+      ^(bool done, dispatch_data_t data, int error) {
+        const char name[event->len];
+        size_t nameSize;
+        (void) dispatch_data_create_map(data, (const void**)&name, &nameSize);
+        // We only read the name.
+        XLOG_CHECK(nameSize == event->len);
+
+        // Now we can begin processing the data.
+        // Check which watch it's from.
+        if(event->wd == _gitDirectoryWatchDescriptor) {
+          // Keep this in sync with _stream:didReceiveEvents:withPaths:flags:
+          // The path will always be in the .git/ directory, and will not
+          // include the .git/ or anything before that.
+          // We only care about ".git/", ".git/refs/*" and ".git/logs/*"
+          if (!name[0] || !strncmp(name, "refs/", 5) || !strncmp(name, "logs/", 5)) {
+            XLOG_DEBUG(@"Processed file system event for '%@%s'", self.repositoryPath, name);
+            _gitDirectoryChanged = YES;
+            // Fire the next _updateTimer in 0.5 seconds
+            CFRunLoopTimerSetNextFireDate(_updateTimer, CFAbsoluteTimeGetCurrent() + kUpdateLatency);
+          } else {
+            XLOG_DEBUG(@"Dropped file system event for '%@%s'", self.repositoryPath, name);
+          }
+        } else if(event->wd == _workingDirectoryWatchDescriptor) {
+          if (strncmp(name, ".git/", 5)) {  // Make sure change is not inside ".git" directory if itself inside workdir
+            int ignored = 0;
+            int status = git_ignore_path_is_ignored(&ignored, self.private, name);  // Make sure path is not ignored
+            if (status != GIT_OK) {
+              LOG_LIBGIT2_ERROR(status);
+            }
+            if (!ignored) {
+              XLOG_DEBUG(@"Processed file system event for '%@%s'", self.repositoryPath, name);
+              _workingDirectoryChanged = YES;
+              CFRunLoopTimerSetNextFireDate(_updateTimer, CFAbsoluteTimeGetCurrent() + kUpdateLatency);
+            } else {
+              XLOG_DEBUG(@"Dropped file system event for '%@%s'", self.repositoryPath, name);
+            }
+          }
+        }
+
+        if(!done && _shouldKeepReadingFromInotifyEventQueue) {
+          // Make sure to keep this in sync with the one below!
+          dispatch_io_read(
+            _inotifyIOChannel, // channel
+            0, // offset (ignored)
+            sizeof(struct inotify_event), // length = single event
+            dispatch_get_main_queue(), // queue = main queue
+            weakEventCallback // I/O handler
+          );
+        } else {
+          _shouldKeepReadingFromInotifyEventQueue = NO;
+        }
+      }
+          );
+        }
+
+        
+      } else {
+        XLOG_ERROR(@"Error reading from inotify event queue: %s\n", strerror(error));
+      }
+    };
+
+    // Make sure to keep this in sync with the one above!
+    dispatch_io_read(
+      _inotifyIOChannel, // channel
+      0, // offset (ignored)
+      sizeof(struct inotify_event), // length = single event excluding name
+      dispatch_get_main_queue(), // queue = main queue
+      eventCallback // I/O handler
+    );
+
+    #endif
 
     [self _reloadWorkingDirectoryStream];
   }
@@ -243,16 +443,25 @@ static void _StreamCallback(ConstFSEventStreamRef streamRef, void* clientCallBac
 
 - (void)dealloc {
   [_undoManager removeAllActionsWithTarget:self];
-  if (_workingDirectoryStream) {
-    FSEventStreamStop(_workingDirectoryStream);
-    FSEventStreamInvalidate(_workingDirectoryStream);
-    FSEventStreamRelease(_workingDirectoryStream);
-  }
-  if (_gitDirectoryStream) {
-    FSEventStreamStop(_gitDirectoryStream);
-    FSEventStreamInvalidate(_gitDirectoryStream);
-    FSEventStreamRelease(_gitDirectoryStream);
-  }
+  #if USE_FSEVENTS
+    if (_workingDirectoryStream) {
+      FSEventStreamStop(_workingDirectoryStream);
+      FSEventStreamInvalidate(_workingDirectoryStream);
+      FSEventStreamRelease(_workingDirectoryStream);
+    }
+    if (_gitDirectoryStream) {
+      FSEventStreamStop(_gitDirectoryStream);
+      FSEventStreamInvalidate(_gitDirectoryStream);
+      FSEventStreamRelease(_gitDirectoryStream);
+    }
+  #elif USE_INOTIFY
+    _shouldKeepReadingFromInotifyEventQueue = NO;
+    inotify_rm_watch(_inotifyEventQueue, _gitDirectoryWatchDescriptor);
+    if(_isMonitoringWorkingDirectory) {
+      inotify_rm_watch(_inotifyEventQueue, _workingDirectoryWatchDescriptor);
+    }
+    dispatch_io_close(_inotifyIOChannel, 0);
+  #endif
   if (_snapshotsTimer) {
     CFRunLoopTimerInvalidate(_snapshotsTimer);
     CFRelease(_snapshotsTimer);
@@ -753,7 +962,8 @@ static void _StreamCallback(ConstFSEventStreamRef streamRef, void* clientCallBac
   NSError* error;
   GCCommit* oldHeadCommit;
   if (!checkoutIfNeeded || [self lookupHEADCurrentCommit:&oldHeadCommit branch:NULL error:&error]) {
-    NSString* message = [NSString stringWithFormat:(_undoManager.redoing ? kGCReflogMessageFormat_GitUp_Redo : kGCReflogMessageFormat_GitUp_Undo), reason, nil];
+    // TODO - Merge _undoManager.redoing as [_undoManager isRedoing] into GNUstep
+    NSString* message = [NSString stringWithFormat:([_undoManager isRedoing] ? kGCReflogMessageFormat_GitUp_Redo : kGCReflogMessageFormat_GitUp_Undo), reason, nil];
     if ([self applyDeltaFromSnapshot:afterSnapshot
                           toSnapshot:beforeSnapshot
                          withOptions:(kGCSnapshotOption_IncludeHEAD | kGCSnapshotOption_IncludeLocalBranches | kGCSnapshotOption_IncludeTags)

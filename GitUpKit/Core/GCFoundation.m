@@ -19,13 +19,25 @@
 
 #import "GCPrivate.h"
 
+// The following is to avoid an error in fileExistsAtPath:followLastSymlink:
+@interface NSFileManager()
+- (NSString *)destinationOfSymbolicLinkAtPath:(NSString *)path 
+                                        error:(NSError * _Nullable *)error;
+@end
+
 @implementation NSFileManager (GCFoundation)
 
 - (BOOL)fileExistsAtPath:(NSString*)path followLastSymlink:(BOOL)followLastSymlink {
   NSDictionary* pathAttributes = [self attributesOfItemAtPath:path error:NULL];
 
   if (followLastSymlink && [[pathAttributes fileType] isEqualToString:NSFileTypeSymbolicLink]) {
-    path = [self destinationOfSymbolicLinkAtPath:path error:NULL];
+    if ([self respondsToSelector: @selector(destinationOfSymbolicLinkAtPath:error:)]) {
+      // #pragma gcc diagnostic push
+      // #pragma gcc diagnostic ignored "-W"
+      path = [self destinationOfSymbolicLinkAtPath:path error:NULL];
+    } else {
+      path = [self pathContentOfSymbolicLinkAtPath:path];
+    }
     if (!path) {
       return NO;
     }

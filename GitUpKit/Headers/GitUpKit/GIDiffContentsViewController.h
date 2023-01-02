@@ -1,0 +1,1 @@
+/home/ethan/Projects/GNUstep/Porting/GitUp/GitUpKit/Components/GIDiffContentsViewController.h

@@ -24,6 +24,11 @@ extern int git_reference__is_branch(const char* ref_name);
 extern int git_reference__is_remote(const char* ref_name);
 extern int git_reference__is_tag(const char* ref_name);
 
+// Declare this so we can use respondsToSelector: @selector(localizedStandardCompare:)
+@interface NSString()
+- (NSComparisonResult)localizedStandardCompare:(NSString *)string;
+@end
+
 @implementation GCRemote {
   __unsafe_unretained GCRepository* _repository;
 }
@@ -92,7 +97,11 @@ extern int git_reference__is_tag(const char* ref_name);
 }
 
 - (NSComparisonResult)nameCompare:(GCRemote*)remote {
-  return [_name localizedStandardCompare:remote->_name];
+  if ([_name respondsToSelector:@selector(localizedStandardCompare:)]) {
+    return [_name localizedStandardCompare:remote->_name];
+  } else {
+    return [_name localizedCaseInsensitiveCompare:remote->_name];
+  }
 }
 
 @end

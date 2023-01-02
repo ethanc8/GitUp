@@ -201,10 +201,10 @@
 - (git_commit*)loadCommitFromBranchReference:(git_reference*)reference error:(NSError**)error {
   git_oid oid;
   if (![self loadTargetOID:&oid fromReference:reference error:error]) {
-    return nil;
+    return NULL;
   }
   git_commit* commit;
-  CALL_LIBGIT2_FUNCTION_RETURN(nil, git_commit_lookup, &commit, self.private, &oid);
+  CALL_LIBGIT2_FUNCTION_RETURN(NULL, git_commit_lookup, &commit, self.private, &oid);
   return commit;
 }
 

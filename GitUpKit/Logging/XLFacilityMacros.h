@@ -8,8 +8,11 @@
 // This file is a conversion of XLFacilityMacros in https://github.com/swisspol/XLFacility
 // In an attempt to use "modern" logging with OSLog, we're reusing the macro names but using os_log under the hood
 
-#import <OSLog/OSLog.h>
 #import <Foundation/Foundation.h>
+#import <TargetConditionals.h>
+
+#if TARGET_OS_MAC
+#import <OSLog/OSLog.h>
 
 #define XLOG_DEBUG(...)                                                                                \
   do {                                                                                                 \
@@ -39,6 +42,39 @@
   do {                                                                                                 \
     os_log_fault(OS_LOG_DEFAULT, "%{public}s", [[NSString stringWithFormat: __VA_ARGS__] UTF8String]); \
   } while (0)
+
+#elif GNUSTEP
+
+#define XLOG_DEBUG(...)                                                                                \
+  do {                                                                                                 \
+    NSDebugLog(__VA_ARGS__); \
+  } while (0)
+#define XLOG_VERBOSE(...)                                                                              \
+  do {                                                                                                 \
+    NSDebugLog(__VA_ARGS__); \
+  } while (0)
+#define XLOG_INFO(...)                                                                                 \
+  do {                                                                                                 \
+    GSPrintf(stdout, __VA_ARGS__); \
+  } while (0)
+#define XLOG_WARNING(...)                                                                              \
+  do {                                                                                                 \
+    NSLog(__VA_ARGS__); \
+  } while (0)
+#define XLOG_ERROR(...)                                                                                \
+  do {                                                                                                 \
+    NSLog(__VA_ARGS__); \
+  } while (0)
+#define XLOG_EXCEPTION(__EXCEPTION__)                                              \
+  do {                                                                             \
+    NSLog(@"%s", [__EXCEPTION__ name]); \
+  } while (0)
+#define XLOG_ABORT(...)                                                                                \
+  do {                                                                                                 \
+    NSLog(__VA_ARGS__); \
+  } while (0)
+
+#endif
 
 /**
  *  These other macros let you easily check conditions inside your code and

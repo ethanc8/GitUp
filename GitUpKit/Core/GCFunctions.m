@@ -19,8 +19,42 @@
 
 #import "GCPrivate.h"
 
+// #define _GNU_SOURCE
+#if TARGET_OS_LINUX
+#define _GNU_SOURCE
+#include <linux/openat2.h>  /* Definition of RESOLVE_* constants */
+#include <sys/syscall.h>    /* Definition of SYS_* constants */
+#include <unistd.h> // syscall
+#include <stdio.h>
+
+// See https://gist.github.com/eatnumber1/f97ac7dad7b1f5a9721f
+
+#ifndef RENAME_WHITEOUT
+/* Flags for renameat2.  */
+# define RENAME_NOREPLACE (1 << 0)
+# define RENAME_EXCHANGE (1 << 1)
+# define RENAME_WHITEOUT (1 << 2)
+#endif
+#ifndef SYS_renameat2
+#if defined(__x86_64__)
+#define SYS_renameat2 314 // from arch/x86/syscalls/syscall_64.tbl
+#elif defined(__i386__)
+#define SYS_renameat2 353 // from arch/x86/syscalls/syscall_32.tbl
+#else
+#error Architecture unsupported
+#endif
+#endif // ifndef SYS_renameat2
+#endif
 #import <sys/stat.h>
+#if __has_include(<sys/attr.h>)
 #import <sys/attr.h>
+#endif
+#if __has_include(<sys/vfs.h>)
+#import <sys/vfs.h>
+#endif
+#if __has_include(<sys/statfs.h>)
+#import <sys/statfs.h>
+#endif
 #import <sys/mount.h>
 
 NSString* const GCErrorDomain = @"GCErrorDomain";
@@ -134,12 +168,17 @@ NSString* GCGitURLFromURL(NSURL* url) {
   return url.absoluteString;
 }
 
+#if TARGET_OS_MAC
 int GCExchangeFileData(const char* path1, const char* path2) {
+  // https://keith.github.io/xcode-man-pages/stat.2.html
+  // Get information about the filesystem storing path2
   struct statfs stat;
   int statStatus = statfs(path2, &stat);
   if (statStatus != 0) {
     return statStatus;
   }
+  // https://keith.github.io/xcode-man-pages/getattrlist.2.html
+  // Get volume capabilities attributes of the filesystem storing path2
   struct attrlist attrList = {ATTR_BIT_MAP_COUNT, 0, 0, ATTR_VOL_CAPABILITIES, 0, 0, 0};
   struct {
     u_int32_t length;
@@ -150,6 +189,8 @@ int GCExchangeFileData(const char* path1, const char* path2) {
     return attrListStatus;
   }
 
+  // https://keith.github.io/xcode-man-pages/rename.2.html
+  // If this bit is set, the file system supports swapping file system objects. See rename(2) for more details
   if ((attrBuf.attr.capabilities[VOL_CAPABILITIES_INTERFACES] & VOL_CAP_INT_RENAME_SWAP) == VOL_CAP_INT_RENAME_SWAP) {
     return renamex_np(path1, path2, RENAME_SWAP);
   }
@@ -160,6 +201,16 @@ int GCExchangeFileData(const char* path1, const char* path2) {
 
   return -1;
 };
+#elif TARGET_OS_LINUX
+// glibc <= 2.28 doesn't have renameat2()
+// 
+// Requires Linux >= 3.15.0
+int GCExchangeFileData(const char* path1, const char* path2) {
+  return syscall(SYS_renameat2, AT_FDCWD, path1, AT_FDCWD, path2, RENAME_EXCHANGE);
+}
+#else
+#error "Your platform doesn't support XLIsDebuggerAttached. Consider implementing it."
+#endif
 
 GCFileMode GCFileModeFromMode(git_filemode_t mode) {
   switch (mode) {
