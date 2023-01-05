@@ -35,5 +35,7 @@
 @interface GISearchToolbarItem : GICustomToolbarItem <GISearchToolbarItem>
 @end
 
+#if !GNUSTEP
 @interface NSSearchToolbarItem (GICustomToolbarItem) <GISearchToolbarItem>
 @end
+#endif
