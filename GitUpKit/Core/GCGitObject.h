@@ -17,12 +17,12 @@
 
 @class GCRepository;
 
-@interface GCObject : NSObject <NSCopying>
+@interface GCGitObject : NSObject <NSCopying>
 @property(nonatomic, readonly) GCRepository* repository;  // NOT RETAINED
 @property(nonatomic, readonly) NSString* SHA1;
 @property(nonatomic, readonly) NSString* shortSHA1;  // First 7 characters (not computed!)
 @end
 
-@interface GCObject (Extensions)
-- (BOOL)isEqualToObject:(GCObject*)object;
+@interface GCGitObject (Extensions)
+- (BOOL)isEqualToObject:(GCGitObject*)object;
 @end

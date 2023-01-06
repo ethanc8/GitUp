@@ -91,7 +91,7 @@ static Boolean _ArrayEqualCallBack(const void* value1, const void* value2) {
   [self _addOperation:operation];
 }
 
-- (void)setDirectTarget:(GCObject*)target forReference:(GCReference*)reference {
+- (void)setDirectTarget:(GCGitObject*)target forReference:(GCReference*)reference {
   [self setDirectTarget:git_object_id(target.private) forReferenceWithName:git_reference_name(reference.private)];
 }
 
@@ -109,7 +109,7 @@ static Boolean _ArrayEqualCallBack(const void* value1, const void* value2) {
   [self setSymbolicTarget:target.UTF8String forReferenceWithName:kHEADReferenceFullName];
 }
 
-- (void)setDirectTargetForHEAD:(GCObject*)target {
+- (void)setDirectTargetForHEAD:(GCGitObject*)target {
   [self setDirectTarget:git_object_id(target.private) forReferenceWithName:kHEADReferenceFullName];
 }
 

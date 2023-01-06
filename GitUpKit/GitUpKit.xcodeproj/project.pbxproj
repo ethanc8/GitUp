@@ -45,7 +45,7 @@
 		E20EB08C19FC75CA0031A075 /* GCRepository+Reset.m in Sources */ = {isa = PBXBuildFile; fileRef = E20EB08A19FC75CA0031A075 /* GCRepository+Reset.m */; };
 		E20EB09019FC76160031A075 /* GCRepository+Status.m in Sources */ = {isa = PBXBuildFile; fileRef = E20EB08E19FC76160031A075 /* GCRepository+Status.m */; };
 		E20F10F41A043E2100076AAC /* GCHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = E20F10F21A043E2100076AAC /* GCHistory.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		E2146C8F1A57F3BC00F4550B /* GCObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E2146C8D1A57F3BC00F4550B /* GCObject.m */; };
+		E2146C8F1A57F3BC00F4550B /* GCGitObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E2146C8D1A57F3BC00F4550B /* GCGitObject.m */; };
 		E21739F41A4FE39E00EC6777 /* GCFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = E21739F21A4FE39E00EC6777 /* GCFunctions.m */; };
 		E21739FF1A51FA6200EC6777 /* GCSubmodule.m in Sources */ = {isa = PBXBuildFile; fileRef = E21739FD1A51FA6200EC6777 /* GCSubmodule.m */; };
 		E21753421B91626B00BE234A /* GCBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = E2C338DB19F85C8600063D95 /* GCBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -59,7 +59,7 @@
 		E217534A1B91626B00BE234A /* GCHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = E20F10F11A043E2100076AAC /* GCHistory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E217534B1B91626B00BE234A /* GCIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = E2790D4B1ACF130A00965A98 /* GCIndex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E217534D1B91626B00BE234A /* GCMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = E244538F1A70CDA200E61DE7 /* GCMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E217534E1B91626B00BE234A /* GCObject.h in Headers */ = {isa = PBXBuildFile; fileRef = E2146C8C1A57F3BC00F4550B /* GCObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E217534E1B91626B00BE234A /* GCGitObject.h in Headers */ = {isa = PBXBuildFile; fileRef = E2146C8C1A57F3BC00F4550B /* GCGitObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E217534F1B91626B00BE234A /* GCReference.h in Headers */ = {isa = PBXBuildFile; fileRef = E2C338E019F85C8600063D95 /* GCReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E21753501B91626B00BE234A /* GCReferenceTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = E218A5881A566F6A00DFF1DF /* GCReferenceTransform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E21753511B91626C00BE234A /* GCReflogMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = E2146C911A58D83100F4550B /* GCReflogMessages.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -89,7 +89,7 @@
 		E217536B1B91634C00BE234A /* GCFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = E21739F21A4FE39E00EC6777 /* GCFunctions.m */; };
 		E217536C1B91634C00BE234A /* GCHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = E20F10F21A043E2100076AAC /* GCHistory.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		E217536D1B91634C00BE234A /* GCIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = E2790D4C1ACF130A00965A98 /* GCIndex.m */; };
-		E217536F1B91634C00BE234A /* GCObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E2146C8D1A57F3BC00F4550B /* GCObject.m */; };
+		E217536F1B91634C00BE234A /* GCGitObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E2146C8D1A57F3BC00F4550B /* GCGitObject.m */; };
 		E21753701B91634C00BE234A /* GCPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = E200A3B81B02DDA100C4E39D /* GCPrivate.m */; };
 		E21753711B91634C00BE234A /* GCReference.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C338E119F85C8600063D95 /* GCReference.m */; };
 		E21753721B91634C00BE234A /* GCReferenceTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = E218A5891A566F6A00DFF1DF /* GCReferenceTransform.m */; };
@@ -148,7 +148,7 @@
 		E267E1C11B84D80500BAB377 /* GCHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = E20F10F11A043E2100076AAC /* GCHistory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E267E1C21B84D80500BAB377 /* GCIndex.h in Headers */ = {isa = PBXBuildFile; fileRef = E2790D4B1ACF130A00965A98 /* GCIndex.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E267E1C31B84D80500BAB377 /* GCLiveRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = E23C1A891A9019610060F6AD /* GCLiveRepository.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		E267E1C41B84D80500BAB377 /* GCObject.h in Headers */ = {isa = PBXBuildFile; fileRef = E2146C8C1A57F3BC00F4550B /* GCObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		E267E1C41B84D80500BAB377 /* GCGitObject.h in Headers */ = {isa = PBXBuildFile; fileRef = E2146C8C1A57F3BC00F4550B /* GCGitObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E267E1C51B84D80500BAB377 /* GCReference.h in Headers */ = {isa = PBXBuildFile; fileRef = E2C338E019F85C8600063D95 /* GCReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E267E1C61B84D80500BAB377 /* GCReferenceTransform.h in Headers */ = {isa = PBXBuildFile; fileRef = E218A5881A566F6A00DFF1DF /* GCReferenceTransform.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		E267E1C71B84D80500BAB377 /* GCReflogMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = E2146C911A58D83100F4550B /* GCReflogMessages.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -170,7 +170,7 @@
 		E267E1D71B84D83100BAB377 /* GCHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = E20F10F21A043E2100076AAC /* GCHistory.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		E267E1D81B84D83100BAB377 /* GCIndex.m in Sources */ = {isa = PBXBuildFile; fileRef = E2790D4C1ACF130A00965A98 /* GCIndex.m */; };
 		E267E1D91B84D83100BAB377 /* GCLiveRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = E23C1A8A1A9019610060F6AD /* GCLiveRepository.m */; };
-		E267E1DA1B84D83100BAB377 /* GCObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E2146C8D1A57F3BC00F4550B /* GCObject.m */; };
+		E267E1DA1B84D83100BAB377 /* GCGitObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E2146C8D1A57F3BC00F4550B /* GCGitObject.m */; };
 		E267E1DB1B84D83100BAB377 /* GCPrivate.m in Sources */ = {isa = PBXBuildFile; fileRef = E200A3B81B02DDA100C4E39D /* GCPrivate.m */; };
 		E267E1DC1B84D83100BAB377 /* GCReference.m in Sources */ = {isa = PBXBuildFile; fileRef = E2C338E119F85C8600063D95 /* GCReference.m */; };
 		E267E1DD1B84D83100BAB377 /* GCReferenceTransform.m in Sources */ = {isa = PBXBuildFile; fileRef = E218A5891A566F6A00DFF1DF /* GCReferenceTransform.m */; };
@@ -372,8 +372,8 @@
 		E20EB09519FC76AE0031A075 /* GCCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCCore.h; sourceTree = "<group>"; };
 		E20F10F11A043E2100076AAC /* GCHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCHistory.h; sourceTree = "<group>"; };
 		E20F10F21A043E2100076AAC /* GCHistory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCHistory.m; sourceTree = "<group>"; };
-		E2146C8C1A57F3BC00F4550B /* GCObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCObject.h; sourceTree = "<group>"; };
-		E2146C8D1A57F3BC00F4550B /* GCObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCObject.m; sourceTree = "<group>"; };
+		E2146C8C1A57F3BC00F4550B /* GCGitObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCGitObject.h; sourceTree = "<group>"; };
+		E2146C8D1A57F3BC00F4550B /* GCGitObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCGitObject.m; sourceTree = "<group>"; };
 		E2146C901A58849F00F4550B /* GCError.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCError.h; sourceTree = "<group>"; };
 		E2146C911A58D83100F4550B /* GCReflogMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GCReflogMessages.h; sourceTree = "<group>"; };
 		E21739F11A4FE39E00EC6777 /* GCFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCFunctions.h; sourceTree = "<group>"; };
@@ -803,8 +803,8 @@
 				E23C1A891A9019610060F6AD /* GCLiveRepository.h */,
 				E23C1A8A1A9019610060F6AD /* GCLiveRepository.m */,
 				E244538F1A70CDA200E61DE7 /* GCMacros.h */,
-				E2146C8C1A57F3BC00F4550B /* GCObject.h */,
-				E2146C8D1A57F3BC00F4550B /* GCObject.m */,
+				E2146C8C1A57F3BC00F4550B /* GCGitObject.h */,
+				E2146C8D1A57F3BC00F4550B /* GCGitObject.m */,
 				74EDB5D01B84D4C400F00E79 /* GCOrderedSet.h */,
 				74EDB5D11B84D4C400F00E79 /* GCOrderedSet.m */,
 				74EDB5D51B84E06500F00E79 /* GCOrderedSet-Tests.m */,
@@ -920,7 +920,7 @@
 				E217534A1B91626B00BE234A /* GCHistory.h in Headers */,
 				E217534B1B91626B00BE234A /* GCIndex.h in Headers */,
 				E217534D1B91626B00BE234A /* GCMacros.h in Headers */,
-				E217534E1B91626B00BE234A /* GCObject.h in Headers */,
+				E217534E1B91626B00BE234A /* GCGitObject.h in Headers */,
 				E217534F1B91626B00BE234A /* GCReference.h in Headers */,
 				E21753501B91626B00BE234A /* GCReferenceTransform.h in Headers */,
 				E21753511B91626C00BE234A /* GCReflogMessages.h in Headers */,
@@ -975,7 +975,7 @@
 				E267E1C21B84D80500BAB377 /* GCIndex.h in Headers */,
 				E267E1C31B84D80500BAB377 /* GCLiveRepository.h in Headers */,
 				E267E2A71B84F03600BAB377 /* GCMacros.h in Headers */,
-				E267E1C41B84D80500BAB377 /* GCObject.h in Headers */,
+				E267E1C41B84D80500BAB377 /* GCGitObject.h in Headers */,
 				DBCF675722CAE12500969D4A /* NSColor+GINamedColors.h in Headers */,
 				E267E1C51B84D80500BAB377 /* GCReference.h in Headers */,
 				E267E1C61B84D80500BAB377 /* GCReferenceTransform.h in Headers */,
@@ -1221,7 +1221,7 @@
 				E217536B1B91634C00BE234A /* GCFunctions.m in Sources */,
 				E217536C1B91634C00BE234A /* GCHistory.m in Sources */,
 				E217536D1B91634C00BE234A /* GCIndex.m in Sources */,
-				E217536F1B91634C00BE234A /* GCObject.m in Sources */,
+				E217536F1B91634C00BE234A /* GCGitObject.m in Sources */,
 				749335CA1B9B7FF200225513 /* GCOrderedSet.m in Sources */,
 				E21753701B91634C00BE234A /* GCPrivate.m in Sources */,
 				E21753711B91634C00BE234A /* GCReference.m in Sources */,
@@ -1268,7 +1268,7 @@
 				E267E1D81B84D83100BAB377 /* GCIndex.m in Sources */,
 				E267E1D91B84D83100BAB377 /* GCLiveRepository.m in Sources */,
 				DBDFBC1D22B61290003EEC6C /* NSColor+GINamedColors.m in Sources */,
-				E267E1DA1B84D83100BAB377 /* GCObject.m in Sources */,
+				E267E1DA1B84D83100BAB377 /* GCGitObject.m in Sources */,
 				749786941B85AAB10065BD55 /* GCOrderedSet.m in Sources */,
 				E267E1DB1B84D83100BAB377 /* GCPrivate.m in Sources */,
 				E267E1DC1B84D83100BAB377 /* GCReference.m in Sources */,
@@ -1364,7 +1364,7 @@
 				E2C56CC41D71B3730011960D /* GCFoundation-Tests.m in Sources */,
 				E299D0161A749D27005035F7 /* GCRepository+Mock-Tests.m in Sources */,
 				E2D4148C1A02D68700B99634 /* GCHistory+Rewrite.m in Sources */,
-				E2146C8F1A57F3BC00F4550B /* GCObject.m in Sources */,
+				E2146C8F1A57F3BC00F4550B /* GCGitObject.m in Sources */,
 				E2C338F419F85C8600063D95 /* GCRepository.m in Sources */,
 				E2F5C2811A8186C200C30739 /* GCSnapshot-Tests.m in Sources */,
 				E218A58F1A56706600DFF1DF /* GCRepository+Utilities.m in Sources */,

@@ -13,13 +13,13 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#import "GCObject.h"
+#import "GCGitObject.h"
 #import "GCReference.h"
 #import "GCRepository.h"
 
 @class GCCommit;
 
-@interface GCTagAnnotation : GCObject
+@interface GCTagAnnotation : GCGitObject
 @property(nonatomic, readonly) NSString* name;
 @property(nonatomic, readonly) NSString* message;  // Raw message including trailing newline
 @property(nonatomic, readonly) NSString* tagger;

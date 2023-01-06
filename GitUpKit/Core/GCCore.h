@@ -26,7 +26,7 @@
 #import "GCLiveRepository.h"
 #endif
 #import "GCMacros.h"
-#import "GCObject.h"
+#import "GCGitObject.h"
 #import "GCOrderedSet.h"
 #import "GCReference.h"
 #import "GCSnapshot.h"

@@ -167,7 +167,7 @@ extern int git_submodule_foreach_block(git_repository* repo, int (^block)(git_su
 
 #endif
 
-@interface GCObject () {
+@interface GCGitObject () {
 @public
   git_object* _private;
 }
@@ -343,7 +343,7 @@ extern int git_submodule_foreach_block(git_repository* repo, int (^block)(git_su
 - (BOOL)enumerateReferencesWithOptions:(GCReferenceEnumerationOptions)options error:(NSError**)error usingBlock:(BOOL (^)(git_reference* reference))block;
 - (BOOL)loadTargetOID:(git_oid*)oid fromReference:(git_reference*)reference error:(NSError**)error;
 - (BOOL)setTargetOID:(const git_oid*)oid forReference:(git_reference*)reference reflogMessage:(NSString*)message newReference:(git_reference**)newReference error:(NSError**)error;  // Follows reference chain until a direct reference and force update its target
-- (GCReference*)createDirectReferenceWithFullName:(NSString*)name target:(GCObject*)target force:(BOOL)force error:(NSError**)error;
+- (GCReference*)createDirectReferenceWithFullName:(NSString*)name target:(GCGitObject*)target force:(BOOL)force error:(NSError**)error;
 - (GCReference*)createSymbolicReferenceWithFullName:(NSString*)name target:(NSString*)target force:(BOOL)force error:(NSError**)error;
 @end
 

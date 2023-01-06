@@ -6,7 +6,7 @@ libGitUpKit_HEADER_FILES = \
 	\
 	GCBranch.h GCCommitDatabase.h GCCommit.h GCCore.h GCDiff.h \
 	GCError.h GCFoundation.h GCFunctions.h GCHistory.h GCIndex.h \
-	GCLiveRepository.h GCMacros.h GCObject.h GCOrderedSet.h \
+	GCLiveRepository.h GCMacros.h GCGitObject.h GCOrderedSet.h \
 	GCReference.h GCReferenceTransform.h GCReflogMessages.h GCRemote.h \
 	GCRepository+Bare.h GCRepository+Config.h GCRepository.h GCRepository+HEAD.h \
 	GCRepository+Mock.h GCRepository+Reflog.h GCRepository+Reset.h \
@@ -26,7 +26,7 @@ libGitUpKit_OBJC_FILES = \
 	Core/GCBranch.m  Core/GCCommitDatabase.m  \
 	Core/GCCommit.m  Core/GCDiff.m  Core/GCFoundation.m \
 	Core/GCFunctions.m Core/GCHistory.m  \
-	Core/GCIndex.m Core/GCLiveRepository.m Core/GCObject.m Core/GCOrderedSet.m \
+	Core/GCIndex.m Core/GCLiveRepository.m Core/GCGitObject.m Core/GCOrderedSet.m \
 	Core/GCPrivate.m Core/GCReference.m Core/GCReferenceTransform.m \
 	Core/GCRemote.m  Core/GCRepository+Bare.m  \
 	Core/GCRepository+Config.m  Core/GCRepository+HEAD.m \

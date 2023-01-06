@@ -214,7 +214,7 @@ cleanup:
   return success;
 }
 
-- (GCReference*)createDirectReferenceWithFullName:(NSString*)name target:(GCObject*)target force:(BOOL)force error:(NSError**)error {
+- (GCReference*)createDirectReferenceWithFullName:(NSString*)name target:(GCGitObject*)target force:(BOOL)force error:(NSError**)error {
   git_reference* reference;
   CALL_LIBGIT2_FUNCTION_RETURN(nil, git_reference_create, &reference, self.private, name.UTF8String, git_object_id(target.private), force, NULL);
   return [[GCReference alloc] initWithRepository:self reference:reference];

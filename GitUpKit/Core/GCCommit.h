@@ -13,10 +13,10 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#import "GCObject.h"
+#import "GCGitObject.h"
 #import "GCRepository.h"
 
-@interface GCCommit : GCObject
+@interface GCCommit : GCGitObject
 @property(nonatomic, readonly) NSString* message;
 @property(nonatomic, readonly) NSString* summary;  // Cleaned first paragraph of the message
 @property(nonatomic, readonly) NSDate* date;

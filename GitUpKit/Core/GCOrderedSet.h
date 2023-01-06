@@ -15,7 +15,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class GCObject;
+@class GCGitObject;
 
 /**
  * This class is optimized to be fast when you have a lot of calls to
@@ -35,8 +35,8 @@
  * But if you will do this, it will appear in the object array
  * at the SAME PLACE AS IT WAS ADDED.
  */
-- (void)addObject:(GCObject*)object;
-- (BOOL)containsObject:(GCObject*)object;
-- (void)removeObject:(GCObject*)object;
+- (void)addObject:(GCGitObject*)object;
+- (BOOL)containsObject:(GCGitObject*)object;
+- (void)removeObject:(GCGitObject*)object;
 
 @end

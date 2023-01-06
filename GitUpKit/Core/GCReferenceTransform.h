@@ -15,17 +15,17 @@
 
 #import "GCRepository.h"
 
-@class GCObject, GCCommit;
+@class GCGitObject, GCCommit;
 
 @interface GCReferenceTransform : NSObject
 @property(nonatomic, readonly) GCRepository* repository;  // NOT RETAINED
 @property(nonatomic, readonly, getter=isIdentity) BOOL identity;  // Transform is empty and does nothing
 - (instancetype)initWithRepository:(GCRepository*)repository reflogMessage:(NSString*)message;
 - (void)setSymbolicTarget:(NSString*)target forReference:(GCReference*)reference;
-- (void)setDirectTarget:(GCObject*)target forReference:(GCReference*)reference;
+- (void)setDirectTarget:(GCGitObject*)target forReference:(GCReference*)reference;
 - (void)deleteReference:(GCReference*)reference;
 - (void)setSymbolicTargetForHEAD:(NSString*)target;
-- (void)setDirectTargetForHEAD:(GCObject*)target;
+- (void)setDirectTargetForHEAD:(GCGitObject*)target;
 @end
 
 @interface GCRepository (GCReferenceTransform)

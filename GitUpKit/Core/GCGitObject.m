@@ -19,7 +19,7 @@
 
 #import "GCPrivate.h"
 
-@implementation GCObject {
+@implementation GCGitObject {
   __unsafe_unretained GCRepository* _repository;
   NSString* _sha1;
 }
@@ -58,23 +58,23 @@
 
 @end
 
-@implementation GCObject (Extensions)
+@implementation GCGitObject (Extensions)
 
 - (NSUInteger)hash {
   const git_oid* oid = git_object_id(_private);
   return *((NSUInteger*)oid->id);  // Use the first bytes of the SHA1
 }
 
-static inline BOOL _EqualObjects(GCObject* object1, GCObject* object2) {
+static inline BOOL _EqualObjects(GCGitObject* object1, GCGitObject* object2) {
   return (object1 == object2) || git_oid_equal(git_object_id(object1->_private), git_object_id(object2->_private));
 }
 
-- (BOOL)isEqualToObject:(GCObject*)object {
+- (BOOL)isEqualToObject:(GCGitObject*)object {
   return _EqualObjects(self, object);
 }
 
 - (BOOL)isEqual:(id)object {
-  if (![object isKindOfClass:[GCObject class]]) {
+  if (![object isKindOfClass:[GCGitObject class]]) {
     return NO;
   }
   return _EqualObjects(self, object);

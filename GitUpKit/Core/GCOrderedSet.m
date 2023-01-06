@@ -39,7 +39,7 @@
   CFRelease(_removedObjectHashes);
 }
 
-- (void)addObject:(GCObject*)object {
+- (void)addObject:(GCGitObject*)object {
   if (![self containsObject:object]) {
     if (CFSetContainsValue(_removedObjectHashes, (__bridge const void*)(object.SHA1))) {
       CFSetRemoveValue(_removedObjectHashes, (__bridge const void*)(object.SHA1));
@@ -50,7 +50,7 @@
   }
 }
 
-- (void)removeObject:(GCObject*)object {
+- (void)removeObject:(GCGitObject*)object {
   if ([self containsObject:object]) {
     // Removing object from NSMutableArray is expensive,
     // so we just moving SHA from one set to another.
@@ -59,13 +59,13 @@
   }
 }
 
-- (BOOL)containsObject:(GCObject*)object {
+- (BOOL)containsObject:(GCGitObject*)object {
   return CFSetContainsValue(_actualObjectHashes, (__bridge const void*)(object.SHA1));
 }
 
 - (NSArray*)objects {
   NSMutableArray* result = [[NSMutableArray alloc] initWithCapacity:_objects.count];
-  for (GCObject* object in _objects) {
+  for (GCGitObject* object in _objects) {
     if ([self containsObject:object]) {  // Return only objects that were not removed
       [result addObject:object];
     }
