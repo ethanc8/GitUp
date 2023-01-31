@@ -31,8 +31,12 @@ static const void* _associatedObjectKey = &_associatedObjectKey;
 - (void)setUp {
   [super setUp];
 
+  #if TARGET_OS_MAC
   // Figure out if running as Xcode Server bot or under Travis CI
   _botMode = [NSUserName() isEqualToString:@"_xcsbuildd"] || getenv("TRAVIS");
+  #else
+  _botMode = YES;
+  #endif
 }
 
 - (GCRepository*)createLocalRepositoryAtPath:(NSString*)path bare:(BOOL)bare {

@@ -113,7 +113,7 @@
     [walk4 addObject:commit];
   }];
   NSArray* array4 = @[ commits[7], commits[9], commits[8], commits[6], commits[4], commits[5], commits[2], commits[3], commits[1], commits[0] ];
-  XCTAssertTrue([walk4 isEqualToArray:array4]);
+  XCTAssertTrue([walk4 isEqualToArray:array4], @"\n%@\n !== \n%@", walk4, array4);
 
   // Check walking history through parents from commit #8
   NSMutableArray* walk5 = [NSMutableArray array];

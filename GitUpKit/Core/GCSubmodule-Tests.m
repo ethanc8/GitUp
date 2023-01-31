@@ -190,6 +190,7 @@
   [self destroyLocalRepository:repository];
 }
 
+// This segfaults -- I don't know why.
 - (void)testRecursiveSubmoduleUpdate {
   NSString* path1 = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
   NSString* path2 = [NSTemporaryDirectory() stringByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];

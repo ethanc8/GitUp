@@ -13,6 +13,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "XLFacilityMacros.h"
 #if !__has_feature(objc_arc)
 #error This file requires ARC
 #endif
@@ -37,6 +38,7 @@ static const git_oid* _CommitParentCallback(size_t idx, void* payload) {
   BOOL success = NO;
   NSMutableArray* commits = [[NSMutableArray alloc] init];
   CFMutableDictionaryRef cache = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, NULL);
+  XLOG_DEBUG_CHECK(CFGetTypeID(cache) == CFDictionaryGetTypeID());
   git_signature* signature = NULL;
   git_treebuilder* builder = NULL;
   git_oid treeOID;
@@ -153,6 +155,8 @@ static const git_oid* _CommitParentCallback(size_t idx, void* payload) {
       GCCommit* commit = [[GCCommit alloc] initWithRepository:self commit:emptyCommit];
       [commits addObject:commit];
       XLOG_DEBUG_CHECK(!CFDictionaryContainsValue(cache, (__bridge const void*)message));
+      // FIXME - This segfaults when message is 0xdac8000000000014 (@"m2")
+      NSLog(@"message = %p = %@", message, message);
       CFDictionarySetValue(cache, (__bridge const void*)message, (__bridge const void*)commit);
 
       // Create lightweight tag if necessary

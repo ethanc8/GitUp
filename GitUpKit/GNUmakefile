@@ -50,7 +50,7 @@ libGitUpKit_HEADER_FILES_DIR = Headers/GitUpKit
 libGitUpKit_HEADER_FILES_INSTALL_DIR = GitUpKit
 
 # ARC
-libGitUpKit_OBJCFLAGS = -fobjc-arc -fobjc-weak -D_GNU_SOURCE=
+libGitUpKit_OBJCFLAGS = -fobjc-arc -fobjc-weak -D_GNU_SOURCE= -DDEBUG=1
 
 Core/GCCommitDatabase.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 Core/GCHistory.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
@@ -60,6 +60,11 @@ Core/GCSnapshot.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 # libgit2
 libGitUpKit_LIBRARIES_DEPEND_UPON = -lGitUpKitGit2 -lCoreFoundation
 libGitUpKit_INCLUDE_DIRS += -I$(GNUSTEP_LOCAL_HEADERS)/GitUpKitGit2 
+
+# sqlite3
+libGitUpKit_LIBRARIES_DEPEND_UPON += -l:libsqlite3.a
+libGitUpKit_LIB_DIRS += -L$(GNUSTEP_LOCAL_LIBRARIES)/GitUpKitSqlite3
+libGitUpKit_INCLUDE_DIRS += -I$(GNUSTEP_LOCAL_HEADERS)/GitUpKitSqlite3
 
 # Tests
 BUNDLE_NAME = GitUpKitTests
@@ -86,5 +91,14 @@ GitUpKitTests_LIB_DIRS = -Lobj
 include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/bundle.make
 
-after-check::
+check::
 	LD_LIBRARY_PATH=${PWD}/obj:${LD_LIBRARY_PATH} xctest GitUpKitTests.bundle
+
+.PHONY: quietcheck
+quietcheck::
+	LD_LIBRARY_PATH=${PWD}/obj:${LD_LIBRARY_PATH} xctest GitUpKitTests.bundle 2>&1 | grep -v "with.incorrect.signature."
+
+.PHONY: gdbcheck
+gdbcheck::
+	# Since it spins off another process, we must 'set follow-fork-mode parent' to stay on the main process.
+	LD_LIBRARY_PATH=${PWD}/obj:${LD_LIBRARY_PATH} gdb -ex 'set follow-fork-mode parent' --args xctest GitUpKitTests.bundle

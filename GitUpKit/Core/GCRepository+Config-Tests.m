@@ -13,6 +13,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include "Foundation/NSObjCRuntime.h"
 #if !__has_feature(objc_arc)
 #error This file requires ARC
 #endif
@@ -44,10 +45,10 @@
   XCTAssertNil([self.repository readConfigOptionForVariable:@"foo.bar" error:NULL]);
 
   NSArray* config1 = [self.repository readConfigForLevel:kGCConfigLevel_Local error:NULL];
-  XCTAssertEqual(config1.count, 6);
+  XCTAssertEqual(config1.count, 6, @"%lld != %lld", (long long)config1.count, (long long)6);
 
   NSArray* config2 = [self.repository readAllConfigs:NULL];
-  XCTAssertEqual(config2.count, 8);
+  XCTAssertEqual(config2.count, 8, @"%lld != %lld", (long long)config2.count, (long long)8);
   NSUInteger index = [config2 indexOfObjectPassingTest:^BOOL(GCConfigOption *obj, NSUInteger idx, BOOL *stop) {
     return [obj.variable isEqualToString:@"core.repositoryformatversion"];
   }];

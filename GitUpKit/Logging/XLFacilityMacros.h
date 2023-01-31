@@ -93,10 +93,10 @@
     NSCAssert(NO, @"Unreachable code executed in '%s': %s:%i", __FUNCTION__, __FILE__, (int)__LINE__);  \
   } while (0)
 
-#if DEBUG
-#define XLOG_DEBUG_CHECK(__CONDITION__) XLOG_CHECK(__CONDITION__)
-#define XLOG_DEBUG_UNREACHABLE() XLOG_UNREACHABLE()
-#else
+// #if DEBUG
+// #define XLOG_DEBUG_CHECK(__CONDITION__) XLOG_CHECK(__CONDITION__)
+// #define XLOG_DEBUG_UNREACHABLE() XLOG_UNREACHABLE()
+// #else
 #define XLOG_DEBUG_CHECK(__CONDITION__)
 #define XLOG_DEBUG_UNREACHABLE()
-#endif
+// #endif

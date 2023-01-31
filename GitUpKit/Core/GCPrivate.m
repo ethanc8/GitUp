@@ -154,18 +154,21 @@
   success = YES;
 
 cleanup:
-  if (inPipe) {
-    [inPipe.fileHandleForReading closeFile];
-    [inPipe.fileHandleForWriting closeFile];
-  }
-  if (outPipe) {
-    [outPipe.fileHandleForReading closeFile];
-    [outPipe.fileHandleForWriting closeFile];
-  }
-  if (errorPipe) {
-    [errorPipe.fileHandleForReading closeFile];
-    [errorPipe.fileHandleForWriting closeFile];
-  }
+  // From -NSFileHandle.fileHandleForReading (https://developer.apple.com/documentation/foundation/nspipe/1414352-filehandleforreading):
+  // > You don’t need to send closeFile to this object or explicitly release the object after you have finished using it.
+  // On GNUstep, this causes an exception.
+  // if (inPipe) {
+  //   [inPipe.fileHandleForReading closeFile];
+  //   [inPipe.fileHandleForWriting closeFile];
+  // }
+  // if (outPipe) {
+  //   [outPipe.fileHandleForReading closeFile];
+  //   [outPipe.fileHandleForWriting closeFile];
+  // }
+  // if (errorPipe) {
+  //   [errorPipe.fileHandleForReading closeFile];
+  //   [errorPipe.fileHandleForWriting closeFile];
+  // }
   _outData = nil;
   _errorData = nil;
   return success;
