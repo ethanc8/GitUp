@@ -13,6 +13,9 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if GNUSTEP
+#import <EJCAsset/libEJCAsset.h>
+#endif
 #import "NSColor+GINamedColors.h"
 #import "NSBundle+GitUpKit.h"
 

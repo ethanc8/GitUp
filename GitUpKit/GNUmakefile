@@ -49,6 +49,8 @@ libGitUpKit_INCLUDE_DIRS += -IHeaders -IHeaders/GitUpKit
 libGitUpKit_HEADER_FILES_DIR = Headers/GitUpKit
 libGitUpKit_HEADER_FILES_INSTALL_DIR = GitUpKit
 
+
+libGitUpKit_LIBRARIES_DEPEND_UPON = -lEJCAsset
 # ARC
 libGitUpKit_OBJCFLAGS = -fobjc-arc -fobjc-weak -D_GNU_SOURCE= -DDEBUG=1
 
@@ -65,6 +67,10 @@ libGitUpKit_INCLUDE_DIRS += -I$(GNUSTEP_LOCAL_HEADERS)/GitUpKitGit2
 libGitUpKit_LIBRARIES_DEPEND_UPON += -l:libsqlite3.a
 libGitUpKit_LIB_DIRS += -L$(GNUSTEP_LOCAL_LIBRARIES)/GitUpKitSqlite3
 libGitUpKit_INCLUDE_DIRS += -I$(GNUSTEP_LOCAL_HEADERS)/GitUpKitSqlite3
+
+libGitUpKit_HAS_RESOURCE_BUNDLE = yes
+libGitUpKit_RESOURCE_FILES = background_pattern@2x.png background_pattern-dark@2x.png background_pattern-dark.png background_pattern.png Base.lproj Components.clr en.lproj GIWindowController.nib icon_alert_caution@2x.png icon_alert_caution.png icon_alert_note@2x.png icon_alert_note.png icon_alert_stop@2x.png icon_alert_stop.png icon_author@2x.png icon_author.png icon_committer@2x.png icon_committer.png icon_file_a@2x.png icon_file_a.png icon_file_conflict@2x.png icon_file_conflict.png icon_file_d@2x.png icon_file_d.png icon_file_m@2x.png icon_file_m.png icon_file_r@2x.png icon_file_r.png icon_file_u@2x.png icon_file_u.png icon_gear@2x.png icon_gear.png Interface.clr Utilities.clr Views.clr
+libGitUpKit_RESOURCE_FILES_DIR = obj/Resources
 
 # Tests
 BUNDLE_NAME = GitUpKitTests
@@ -90,6 +96,29 @@ GitUpKitTests_LIB_DIRS = -Lobj
 
 include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/bundle.make
+
+obj/Resources/Interface.clr: $(wildcard Interface/Interface.xcasssets/**/*)
+	mkdir -p obj/Resources
+	AssetCompiler ${PWD}/Interface/Interface.xcassets --outBundle ${PWD}/obj
+
+obj/Resources/Components.clr: $(wildcard Components/Components.xcassets/**/*)
+	mkdir -p obj/Resources
+	AssetCompiler ${PWD}/Components/Components.xcassets --outBundle ${PWD}/obj
+
+obj/Resources/Utilities.clr: $(wildcard Utilities/Utilities.xcassets/**/*)
+	mkdir -p obj/Resources
+	AssetCompiler ${PWD}/Utilities/Utilities.xcassets --outBundle ${PWD}/obj
+
+obj/Resources/Views.clr: $(wildcard Views/Views.xcassets/**/*)
+	mkdir -p obj/Resources
+	AssetCompiler ${PWD}/Views/Views.xcassets --outBundle ${PWD}/obj
+
+obj/GIWindowController.nib: $(wildcard PrebuiltResources/**/*)
+	cp -r PrebuiltResources/* obj/Resources/
+
+before-all:: obj/Resources/Interface.clr obj/Resources/Components.clr \
+	obj/Resources/Utilities.clr obj/Resources/Views.clr \
+	obj/GIWindowController.nib
 
 check::
 	LD_LIBRARY_PATH=${PWD}/obj:${LD_LIBRARY_PATH} xctest GitUpKitTests.bundle
