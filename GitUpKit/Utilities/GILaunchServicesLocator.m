@@ -7,6 +7,9 @@
 
 #import "GILaunchServicesLocator.h"
 #import "XLFacilityMacros.h"
+#if GNUSTEP
+#import <AppKit/NSWorkspace.h>
+#endif
 
 // Settings
 NSString* const GIPreferences_DiffTool = @"GIPreferences_DiffTool";
@@ -56,7 +59,9 @@ static NSString* _diffTemporaryDirectoryPath = nil;
 }
 @end
 
+#if TARGET_OS_MAC
 @import CoreServices;
+#endif
 @implementation GILaunchServicesLocator
 #pragma mark - Setup
 + (void)setup {
@@ -100,6 +105,7 @@ static NSString* _diffTemporaryDirectoryPath = nil;
   if (bundleIdentifier == nil) {
     return NO;
   }
+  #if TARGET_OS_MAC
   CFErrorRef error = NULL;
   NSArray* applications = CFBridgingRelease(LSCopyApplicationURLsForBundleIdentifier((__bridge CFStringRef)bundleIdentifier, &error));
   if (error) {
@@ -108,6 +114,11 @@ static NSString* _diffTemporaryDirectoryPath = nil;
     return NO;
   }
   return applications.count > 0;
+  #elif GNUSTEP
+  return [[NSWorkspace sharedWorkspace] locateApplicationBinary: bundleIdentifier] != nil;
+  #else
+  return NO;
+  #endif
 }
 
 #pragma mark - Diff Tools Supplement

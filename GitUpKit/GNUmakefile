@@ -18,10 +18,17 @@ libGitUpKit_HEADER_FILES = \
 	GCHistory+Rewrite.h GCLiveRepository+Utilities.h \
 	GCRepository+Index.h GCRepository+Utilities.h \
 	\
-	# GIBranch.h GIConstants.h GIDiffView.h GIFunctions.h GIGraph.h GIGraphView.h \
-	# GIImageDiffView.h GIInterface.h GILayer.h GILine.h GINode.h GIPrivate.h \
-	# GISplitDiffView.h GIUnifiedDiffView.h
+	GIBranch.h GIConstants.h GIDiffView.h GIFunctions.h GIGraph.h GIGraphView.h \
+	GIImageDiffView.h GIInterface.h GILayer.h GILine.h GINode.h GIPrivate.h \
+	GISplitDiffView.h GIUnifiedDiffView.h \
+	\
+	NSColor+GINamedColors.h \
+	\
+	GIAppKit.h GIColorView.h GICustomToolbarItem.h GILaunchServicesLocator.h \
+	GILinkButton.h GIModalView.h GIViewController.h GIViewController+Utilities.h \
+	GIWindowController.h NSBundle+GitUpKit.h NSColor+GINamedColors.h
 
+# Interface/GIImageDiffView.m Utilities/GIModalView.m Utilities/GIWindowController.m requires CAAppKitBridge.
 libGitUpKit_OBJC_FILES = \
 	Core/GCBranch.m  Core/GCCommitDatabase.m  \
 	Core/GCCommit.m  Core/GCDiff.m  Core/GCFoundation.m \
@@ -40,24 +47,57 @@ libGitUpKit_OBJC_FILES = \
 	Extensions/GCHistory+Rewrite.m Extensions/GCLiveRepository+Utilities.m \
 	Extensions/GCRepository+Index.m Extensions/GCRepository+Utilities.m \
 	\
-	# Interface/GIBranch.m Interface/GIDiffView.m Interface/GIFunctions.m \
-	# Interface/GIGraph.m Interface/GIGraphView.m Interface/GIImageDiffView.m \
-	# Interface/GILayer.m Interface/GILine.m Interface/GINode.m \
-	# Interface/GIPrivate.m Interface/GISplitDiffView.m Interface/GIUnifiedDiffView.m
+	Interface/GIBranch.m Interface/GIDiffView.m Interface/GIFunctions.m \
+	Interface/GIGraph.m Interface/GIGraphView.m \
+	Interface/GILayer.m Interface/GILine.m Interface/GINode.m \
+	Interface/GIPrivate.m Interface/GISplitDiffView.m Interface/GIUnifiedDiffView.m \
+	\
+	Utilities/NSColor+GINamedColors.m \
+	\
+	\
+	Utilities/GIAppKit.m Utilities/GIColorView.m Utilities/GICustomToolbarItem.m \
+	Utilities/GILaunchServicesLocator.m Utilities/GILinkButton.m \
+	Utilities/GIViewController.m Utilities/GIViewController+Utilities.m \
+	Utilities/NSBundle+GitUpKit.m \
+	Utilities/NSColor+GINamedColors.m \
+	# \
+	# Views/GIAdvancedCommitViewController.m Views/GICommitRewriterViewController.m \
+	# Views/GICommitSplitterViewController.m Views/GICommitViewController.m \
+	# Views/GIConfigViewController.m Views/GIConflictResolverViewController.m \
+	# Views/GIDiffViewController.m Views/GIMapViewController.m \
+	# Views/GIMapViewController+Operations.m Views/GIQuickViewController.m \
+	# Views/GISimpleCommitViewController.m Views/GIStashListViewController.m \
+	# \
+	## Requires NSTableCellViewController: \
+	# Components/GICommitListViewController.m Components/GIDiffContentsViewController.m \
+	# Components/GIDiffFilesViewController.m Components/GISnapshotListViewController.m \
+	# Components/GIUnifiedReflogViewController.m \
 
 libGitUpKit_INCLUDE_DIRS += -IHeaders -IHeaders/GitUpKit
 libGitUpKit_HEADER_FILES_DIR = Headers/GitUpKit
 libGitUpKit_HEADER_FILES_INSTALL_DIR = GitUpKit
 
+libGitUpKit_OBJCFLAGS = -D_GNU_SOURCE= -DDEBUG=1
 
 libGitUpKit_LIBRARIES_DEPEND_UPON = -lEJCAsset
+
+# FIXME: These warnings should be enabled, but we don't want to see
+#        so many warnings that we can't see the other warnings.
+libGitUpKit_OBJCFLAGS += -Wno-block-capture-autoreleasing -Wno-nullability-completeness
+
 # ARC
-libGitUpKit_OBJCFLAGS = -fobjc-arc -fobjc-weak -D_GNU_SOURCE= -DDEBUG=1
+libGitUpKit_OBJCFLAGS += -fobjc-arc -fobjc-weak
 
 Core/GCCommitDatabase.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 Core/GCHistory.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 Core/GCRepository+Reflog.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 Core/GCSnapshot.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
+Interface/GIBranch.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
+Interface/GIGraph.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
+Interface/GIGraphView.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
+Interface/GILayer.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
+Interface/GILine.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
+Interface/GINode.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 
 # libgit2
 libGitUpKit_LIBRARIES_DEPEND_UPON = -lGitUpKitGit2 -lCoreFoundation

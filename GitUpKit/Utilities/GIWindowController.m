@@ -80,7 +80,7 @@
 
 static void _WalkViewTree(NSView* view, NSMutableArray* array) {
   for (NSView* subview in view.subviews) {
-    if (!subview.hidden) {
+    if (!subview.isHidden) {
       if ([subview isKindOfClass:[NSTextField class]] || [subview isKindOfClass:[NSTextView class]] || ([subview isKindOfClass:[NSTableView class]] && (![[(NSTableView*)subview delegate] respondsToSelector:@selector(selectionShouldChangeInTableView:)] || [[(NSTableView*)subview delegate] selectionShouldChangeInTableView:(NSTableView*)subview]))  // Allows NSTableView assuming it doesn't return NO for -selectionShouldChangeInTableView:
           || [subview isKindOfClass:[GIGraphView class]]) {  // Always allow GIGraphView which can become first-responder
         if (subview.acceptsFirstResponder) {
@@ -177,7 +177,13 @@ static void _TimerCallBack(CFRunLoopTimerRef timer, void* info) {
 
 - (instancetype)initWithWindow:(NSWindow*)window {
   if ((self = [super initWithWindow:window])) {
+    #if TARGET_OS_MAC
     [[NSBundle bundleForClass:[GIWindowController class]] loadNibNamed:@"GIWindowController" owner:self topLevelObjects:NULL];
+    #else
+    [[[NSNib alloc] initWithNibNamed: @"GIWindowController"
+                              bundle: [NSBundle bundleForClass:[GIWindowController class]]] 
+      instantiateNibWithOwner:self topLevelObjects:NULL];
+    #endif
     XLOG_DEBUG_CHECK(_overlayView);
 
     // Force a dark appearance of the overlay. Set in the nib for 10.14.

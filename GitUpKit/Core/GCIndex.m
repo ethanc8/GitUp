@@ -30,27 +30,6 @@
 
 #import "GCPrivate.h"
 
-// TODO - Contribute this upstream
-// TODO - Test this
-#if GNUSTEP
-@interface NSRegularExpression(GCIndex)
-+ (NSString *)escapedPatternForString:(NSString *)string;
-@end
-@implementation NSRegularExpression(GCIndex)
-+ (NSString *)escapedPatternForString:(NSString *)string {
-  return [[NSRegularExpression 
-    regularExpressionWithPattern: @"([*?+\\[(){}^$|\\\\.])" 
-                         options: 0 
-                           error: NULL]
-    stringByReplacingMatchesInString: string
-                             options: 0
-                               range: NSMakeRange(0, [string length]) 
-                        withTemplate: @"\\\\$1"
-  ];
-}
-@end
-#endif
-
 // libgit2 SPI
 extern void git_index_entry__init_from_stat(git_index_entry* entry, struct stat* st, bool trust_mode);
 

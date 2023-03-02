@@ -15,63 +15,6 @@
 
 #import <AppKit/AppKit.h>
 
-// FIXME - Contribute this upstream to GNUstep
-#if GNUSTEP
-@protocol NSSplitViewDelegate <NSObject>
-@optional
-- (void) splitView: (NSSplitView *)sender 
-resizeSubviewsWithOldSize: (NSSize)oldSize;
-
-- (void) splitView: (NSSplitView *)sender 
-constrainMinCoordinate: (CGFloat *)min 
-     maxCoordinate: (CGFloat *)max 
-       ofSubviewAt: (NSInteger)offset;
-
-- (CGFloat) splitView: (NSSplitView *)sender
-constrainSplitPosition: (CGFloat)proposedPosition
-	ofSubviewAt: (NSInteger)offset;
-
-- (void) splitViewWillResizeSubviews: (NSNotification *)notification;
-- (void) splitViewDidResizeSubviews: (NSNotification *)notification;
-
-#if OS_API_VERSION(GS_API_MACOSX, GS_API_LATEST)
-- (BOOL) splitView: (NSSplitView *)sender
-canCollapseSubview: (NSView *)subview;
-
-- (CGFloat) splitView: (NSSplitView *)sender
-constrainMaxCoordinate: (CGFloat)proposedMax
-	ofSubviewAt: (NSInteger)offset;
-
-- (CGFloat) splitView: (NSSplitView *)sender
-constrainMinCoordinate: (CGFloat)proposedMin
-	ofSubviewAt: (NSInteger)offset;
-#endif
-
-#if OS_API_VERSION(MAC_OS_X_VERSION_10_5, GS_API_LATEST)
-- (NSRect) splitView: (NSSplitView *)splitView
-additionalEffectiveRectOfDividerAtIndex: (NSInteger)dividerIndex;
-
-- (NSRect) splitView: (NSSplitView *)splitView
-       effectiveRect: (NSRect)proposedEffectiveRect
-        forDrawnRect: (NSRect)drawnRect
-    ofDividerAtIndex: (NSInteger)dividerIndex;
-
-- (BOOL) splitView: (NSSplitView *)splitView 
-shouldCollapseSubview: (NSView *)subview
-forDoubleClickOnDividerAtIndex: (NSInteger)dividerIndex;
-
-- (BOOL) splitView: (NSSplitView *)splitView
-shouldHideDividerAtIndex: (NSInteger)dividerIndex;
-#endif
-
-#if OS_API_VERSION(MAC_OS_X_VERSION_10_6, GS_API_LATEST)
-- (BOOL) splitView: (NSSplitView *)splitView
-shouldAdjustSizeOfSubview: (NSView *)view;
-#endif
-
-@end
-#endif // GNUSTEP
-
 typedef NS_ENUM(NSUInteger, GIAlertType) {
   kGIAlertType_Note = 0,
   kGIAlertType_Caution,

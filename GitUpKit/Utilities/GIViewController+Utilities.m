@@ -307,7 +307,11 @@
 }
 
 - (void)showFileInFinder:(NSString*)path {
+  #if TARGET_OS_MAC
   [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:@[ [NSURL fileURLWithPath:[self.repository absolutePathForFile:path]] ]];
+  #else
+  [[NSWorkspace sharedWorkspace] selectFile: [self.repository absolutePathForFile: path] inFileViewerRootedAtPath: @""];
+  #endif
 }
 
 - (void)openSubmoduleWithApp:(NSString*)path {

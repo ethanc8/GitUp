@@ -121,7 +121,11 @@
   XLOG_DEBUG_CHECK(!self.nibBundle && !self.nibName);
   Class nibClass = self.class;
   while (nibClass) {
+    #if TARGET_OS_MAC
     if ([[NSBundle bundleForClass:nibClass] loadNibNamed:NSStringFromClass(nibClass) owner:self topLevelObjects:NULL]) {
+    #else
+    if ([[[NSNib alloc] initWithNibNamed:NSStringFromClass(nibClass) bundle:[NSBundle bundleForClass:nibClass]] instantiateNibWithOwner:self topLevelObjects:NULL]) {
+    #endif
       break;
     }
     nibClass = nibClass.superclass;
@@ -231,13 +235,18 @@
     alert.type = type;
     alert.messageText = title;
     alert.informativeText = message;
+    // TODO - Implement suppression button on GNUstep
+    #if TARGET_OS_MAC
     alert.showsSuppressionButton = key ? YES : NO;
+    #endif
     NSButton* defaultButton = [alert addButtonWithTitle:button];
     if (type == kGIAlertType_Danger) {
       defaultButton.keyEquivalent = @"";
+      #if TARGET_OS_MAC
       if (@available(macOS 11, *)) {
         defaultButton.hasDestructiveAction = YES;
       }
+      #endif
     }
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
     [self presentAlert:alert
@@ -245,9 +254,11 @@
           if (returnCode == NSAlertFirstButtonReturn) {
             block();
           }
+          #if TARGET_OS_MAC
           if (alert.suppressionButton.state) {
             [[NSUserDefaults standardUserDefaults] setBool:YES forKey:key];
           }
+          #endif
         }];
   }
 }

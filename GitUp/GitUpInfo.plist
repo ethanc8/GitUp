@@ -1,0 +1,40 @@
+{
+    CFBundleDevelopmentRegion = en;
+    CFBundleDocumentTypes = (
+	{
+	    CFBundleTypeName = "Git Repository";
+	    CFBundleTypeRole = Editor;
+	    LSItemContentTypes = (
+		"public.directory"
+	    );
+	    NSDocumentClass = Document;
+	}
+    );
+    CFBundleExecutable = "$(EXECUTABLE_NAME)";
+    CFBundleIdentifier = "${PRODUCT_BUNDLE_IDENTIFIER}";
+    CFBundleInfoDictionaryVersion = "6.0";
+    CFBundleName = GitUp;
+    CFBundlePackageType = APPL;
+    CFBundleShortVersionString = "1.3.4";
+    CFBundleVersion = "${BUNDLE_VERSION}";
+    LSMinimumSystemVersion = "$(MACOSX_DEPLOYMENT_TARGET)";
+    NSAppleEventsUsageDescription = Please;
+    NSHumanReadableCopyright = "Copyright \U00A9 2015-2019 Pierre-Olivier Latour. All rights reserved.";
+    NSMainNibFile = MainMenu;
+    NSPrincipalClass = NSApplication;
+    NSServices = (
+	{
+	    NSMenuItem = {
+		default = "Open in GitUp";
+	    };
+	    NSMessage = openRepository;
+	    NSRequiredContext = {
+		NSTextContent = FilePath;
+	    };
+	    NSSendTypes = (
+		NSURLPboardType,
+		NSFilenamesPboardType
+	    );
+	}
+    );
+}

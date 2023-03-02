@@ -441,6 +441,7 @@ static const void* _associatedObjectDataKey = &_associatedObjectDataKey;
   NSMenu* menu = [_delegate graphView:self willShowContextualMenuForNode:node];
   if (menu) {
     NSPoint point = [self positionForNode:node];
+    // For some reason, this method has different names in GNUstep and in macOS.
     [menu popUpMenuPositioningItem:nil atLocation:NSMakePoint(point.x + kContextualMenuOffsetX, point.y + kContextualMenuOffsetY) inView:self];
   }
 }
@@ -1705,7 +1706,7 @@ static void _DrawSelectedNode(CGContextRef context, CGFloat x, CGFloat y, GINode
       CGContextSetRGBFillColor(context, 1.0, 0.0, 0.0, 0.666);
       CGContextFillRect(context, SELECTED_NODE_BOUNDS(x, y));
 #endif
-      _DrawSelectedNode(context, x, y, _selectedNode, selectedAttributes1, selectedAttributes2, _dateFormatter, self.window.keyWindow && (self.window.firstResponder == self));
+      _DrawSelectedNode(context, x, y, _selectedNode, selectedAttributes1, selectedAttributes2, _dateFormatter, self.window.isKeyWindow && (self.window.firstResponder == self));
     }
   }
 
@@ -1718,7 +1719,7 @@ static void _DrawSelectedNode(CGContextRef context, CGFloat x, CGFloat y, GINode
       CGContextSetRGBFillColor(context, 1.0, 0.0, 0.0, 0.666);
       CGContextFillRect(context, SELECTED_NODE_BOUNDS(x, y));
 #endif
-      _DrawSelectedNode(context, x, y, _lastSelectedNode, selectedAttributes1, selectedAttributes2, _dateFormatter, self.window.keyWindow && (self.window.firstResponder == self));
+      _DrawSelectedNode(context, x, y, _lastSelectedNode, selectedAttributes1, selectedAttributes2, _dateFormatter, self.window.isKeyWindow && (self.window.firstResponder == self));
     }
   }
 

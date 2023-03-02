@@ -17,6 +17,10 @@
 #error This file requires ARC
 #endif
 
+#if GNUSTEP
+#import <EJCAsset/libEJCAsset.h>
+#import <CoreGraphics/CoreGraphics.h>
+#endif
 #import <objc/runtime.h>
 
 #import "GIAppKit.h"
@@ -173,6 +177,8 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
 
   NSUserDefaults* defaults = NSUserDefaults.standardUserDefaults;
   self.continuousSpellCheckingEnabled = [defaults boolForKey:GICommitMessageViewUserDefaultKey_EnableSpellChecking];
+  // The following are not available in GNUstep-gui's NSView:
+  #if TARGET_OS_MAC
   self.automaticSpellingCorrectionEnabled = NO;  // Don't trust IB
   self.grammarCheckingEnabled = NO;  // Don't trust IB
   self.automaticLinkDetectionEnabled = NO;  // Don't trust IB
@@ -180,6 +186,7 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
   self.automaticDashSubstitutionEnabled = NO;  // Don't trust IB
   self.automaticDataDetectionEnabled = NO;  // Don't trust IB
   self.automaticTextReplacementEnabled = NO;  // Don't trust IB
+  #endif
   self.smartInsertDeleteEnabled = YES;  // Don't trust IB
   self.textColor = NSColor.textColor;  // Don't trust IB
   self.backgroundColor = NSColor.textBackgroundColor;  // Don't trust IB
@@ -242,7 +249,7 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
       [self setNeedsDisplay:YES];
     } else if ([keyPath isEqualToString:GICommitMessageViewUserDefaultKey_EnableSpellChecking]) {
       BOOL flag = [[NSUserDefaults standardUserDefaults] boolForKey:GICommitMessageViewUserDefaultKey_EnableSpellChecking];
-      if (flag != self.continuousSpellCheckingEnabled) {
+      if (flag != self.isContinuousSpellCheckingEnabled) {
         self.continuousSpellCheckingEnabled = flag;
         [self setNeedsDisplay:YES];  // TODO: Why is this needed to refresh?
       }
@@ -326,6 +333,8 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
 
 @end
 
+// TODO - Fix on GNUstep
+#if TARGET_OS_MAC
 @interface GILayoutManager () <NSLayoutManagerDelegate>
 @end
 
@@ -392,6 +401,7 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
 }
 
 @end
+#endif
 
 @implementation GIDualSplitView
 
@@ -414,7 +424,7 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
 }
 
 - (CGFloat)splitView:(NSSplitView*)splitView constrainMaxCoordinate:(CGFloat)proposedMaximumPosition ofSubviewAt:(NSInteger)dividerIndex {
-  return (splitView.vertical ? splitView.bounds.size.width : splitView.bounds.size.height) - _minSize2;
+  return (splitView.isVertical ? splitView.bounds.size.width : splitView.bounds.size.height) - _minSize2;
 }
 
 // See http://stackoverflow.com/a/30494691/463432
@@ -422,7 +432,7 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
   [splitView adjustSubviews];
   // Take the min size constraints into account.
   NSView* view = splitView.subviews.firstObject;
-  [splitView setPosition:(splitView.vertical ? view.frame.size.width : view.frame.size.height) ofDividerAtIndex:0];
+  [splitView setPosition:(splitView.isVertical ? view.frame.size.width : view.frame.size.height) ofDividerAtIndex:0];
 }
 
 @end

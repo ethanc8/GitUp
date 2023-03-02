@@ -15,9 +15,11 @@
 
 #import "GICustomToolbarItem.h"
 
+#if TARGET_OS_MAC
 API_AVAILABLE(macos(11))
 @interface GINSSearchToolbarItem : NSSearchToolbarItem
 @end
+#endif
 
 @implementation GICustomToolbarItem
 
@@ -29,7 +31,7 @@ API_AVAILABLE(macos(11))
 
 - (void)validate {
   [GICustomToolbarItem validateAsUserInterfaceItem:self];
-  if (self.enabled) {
+  if (self.isEnabled) {
     [GICustomToolbarItem validateAsUserInterfaceItem:self.primaryControl];
     [GICustomToolbarItem validateAsUserInterfaceItem:self.secondaryControl];
   }
@@ -57,7 +59,12 @@ API_AVAILABLE(macos(11))
 
 + (id)allocWithZone:(NSZone*)zone {
   if (@available(macOS 11, *)) {
+    #if TARGET_OS_MAC
     return (id)[GINSSearchToolbarItem allocWithZone:zone];
+    #else
+    // Will never occur -- here to hide warning.
+    return nil;
+    #endif
   } else {
     return [super allocWithZone:zone];
   }
@@ -76,6 +83,7 @@ API_AVAILABLE(macos(11))
 
 // MARK: -
 
+#if TARGET_OS_MAC
 @implementation GINSSearchToolbarItem
 
 - (void)validate {
@@ -83,3 +91,4 @@ API_AVAILABLE(macos(11))
 }
 
 @end
+#endif
