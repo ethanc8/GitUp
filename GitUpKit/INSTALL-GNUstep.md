@@ -7,9 +7,27 @@
 ```bash
 ```
 
-### Other
+### Other ones (not in package manager)
 
-[MiscHeaders](https://github.com/ethanc8/MiscHeaders)
+* [MiscHeaders](https://github.com/ethanc8/MiscHeaders)
+* A GNUstep which uses libobjc2 and libdispatch
+  * [libobjc2 (GNUstep Next-Generation Objective-C 2.0 Runtime)](https://github.com/gnustep/libobjc2)
+  * [GNUstep Makefiles Library](https://github.com/gnustep/tools-make)
+  * [GNUstep-base (Foundation Kit)](https://github.com/gnustep/libs-base)
+* A CoreFoundation which provides bridging to Foundation
+  * [Catalina-CoreFoundation with bridging](https://github.com/ethanc8/swift-corelibs-foundation)
+
+#### Dependencies for graphical components
+
+* [GNUstep-gui (AppKit)](https://github.com/gnustep/libs-base)
+* [Opal - Core Graphics](https://github.com/gnustep/libs-opal)
+* [QuartzCore - Core Animation](https://github.com/gnustep/libs-quartzcore)
+
+Opal's dependencies:
+
+```bash
+sudo apt install liblcms2-dev libcairo2-dev libjpeg8-dev libpng-dev libtiff5-dev
+```
 
 ### libgit2
 
@@ -70,6 +88,10 @@ rm -r build; \
     && sudo -E cmake --install build/
 ```
 
+### libsqlite3
+
+Run `Third-Party/rebuild-libsqlite3-linux.sh`
+
 ### macOS graphics APIs
 
 ### Bridging
@@ -116,3 +138,5 @@ Need (without c-ares):
 * `CFFileDescriptorGetNativeDescriptor`
 * `CFFileDescriptorContext`
 * `CFFileDescriptorCreate`
+
+We solved this in our CoreFoundation port.
