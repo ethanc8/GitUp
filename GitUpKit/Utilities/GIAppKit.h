@@ -60,56 +60,6 @@ FOUNDATION_EXPORT void GIPerformOnMainRunLoop(dispatch_block_t block);
 @interface GICommitMessageView : GITextView
 @end
 
-// HACK - We should fix this upstream!
-#if GNUSTEP
-
-
-typedef NS_ENUM(NSInteger, NSTableViewRowSizeStyle) {
-    /* The table will use the system default layout size: small, medium or large. */
-    NSTableViewRowSizeStyleDefault = -1,
-    
-    /* The table will use the -rowHeight or ask the delegate for a variable row height (if implemented) and cell layout is not changed. */
-    NSTableViewRowSizeStyleCustom = 0,
-    
-    /* The table will use a row height specified for a small/medium or large table.
-     It is required that all sizes be fully tested and supported if NSTableViewRowSizeStyleCustom is not used.
-     Some standard Aqua metrics may be applied to cells based on the current size. Specifically, the metrics will be applied to the NSTableCellView's textField and imageView outlets. Don't use these and add your own outlets if you wish to control the metrics yourself. */
-    NSTableViewRowSizeStyleSmall = 1,
-    NSTableViewRowSizeStyleMedium = 2,
-    NSTableViewRowSizeStyleLarge = 3,
-} API_AVAILABLE(macos(10.7));
-
-@class NSTextField, NSImageView, NSDraggingImageComponent;
-
-/* View Based NSTableView: The NSTableCellView is a reusable container view shown for a particular cell in the table. See NSTableView.h for more information. 
- */
-API_AVAILABLE(macos(10.7))
-@interface NSTableCellView : NSView
-
-/* The 'objectValue' is automatically set by the table when using bindings, or the result from the dataSource method -tableView:objectValueForTableColumn:row:. Key Value Observing (KVO) compliant so user interface elements can be bound to the 'objectValue'. 
- */
-@property (nullable, strong) id objectValue;
-
-/* The following two properties are provided for the developer to hook up as outlets. These outlets can then be accessed in -tableView:viewForTableColumn:row: and modified. Additional outlets can be added by subclassing NSTableCellView, adding appropriate ivars and properties, and hooking it up in Interface Builder.
- */
-@property (nullable, assign) IBOutlet NSTextField *textField;
-@property (nullable, assign) IBOutlet NSImageView *imageView;
-
-/* The backgroundStyle property is automatically set by the enclosing NSTableRowView to let this view know what its background looks like. For instance, when the -backgroundStyle is NSBackgroundStyleEmphasized, the view should use a contrasting text color. The system label colors (labelColor, secondaryLabelColor, tertiaryLabelColor, and quaternaryLabelColor) automatically adapt when displayed with an emphasized backgroundStyle. Upon setting, the default implementation automatically forwards calls to all subviews that implement -setBackgroundStyle: or are an NSControl (which have NSCells that respond to -setBackgroundStyle:).
- */
-@property NSBackgroundStyle backgroundStyle;
-
-/* The rowSizeStyle is set by the NSTableView to its -effectiveRowSizeStyle. The cell view will layout the textField and imageView based on the rowSizeStyle. A value of NSTableViewRowSizeStyleDefault should never be set on the cell view, as it is an appropriate value only for the table. See NSTableView.h for more information. 
- */
-@property NSTableViewRowSizeStyle rowSizeStyle;
-
-/* Multi-Item Drag Support. The default implementation will return an array of up to two NSDraggingImageComponent instances -- one for the imageView and another for the textField (if not nil). These methods can be subclassed and overridden to provide a custom set of NSDraggingImageComponents to create the drag image from this view.
- */
-@property (readonly, strong) NSArray<NSDraggingImageComponent *> *draggingImageComponents;
-
-@end
-#endif
-
 @interface GITableCellView : NSTableCellView
 @property(nonatomic) NSInteger row;
 - (void)saveTextFieldColors;
