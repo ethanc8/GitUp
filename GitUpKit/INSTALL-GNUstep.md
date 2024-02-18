@@ -110,33 +110,3 @@ Also:
 We need [UTI functions](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/understanding_utis/understand_utis_intro/understand_utis_intro.html#//apple_ref/doc/uid/TP40001319-CH201-SW1), which are provided by [CarbonCore/LaunchServices and MobileCoreServices](https://developer.apple.com/documentation/coreservices/1448939-uttypecreatepreferredidentifierf?language=objc), [gnustep/libs-boron](https://github.com/gnustep/libs-boron/blob/master/Headers/LaunchServices/UTType.h) and by [ravynOS Launch Services](https://github.com/ravynsoft/ravynos/blob/main/Frameworks/LaunchServices/UTTypes.h). Boron looks more complete.
 
 Note that these functions were deprecated in macOS 12.0 in favor of [Uniform Type Identifiers.framework](https://developer.apple.com/documentation/uniformtypeidentifiers?language=objc)
-
-## Dependencies (XLFacility)
-
-XLFacility is no longer a dependency, so this doesn't matter.
-
-### CFNetwork
-
-```
-git clone https://github.com/gerickson/opencfnetwork.git --branch 129.20.4
-cd opencfnetwork
-CC=$(gnustep-config --variable=CC) CFLAGS="-Wno-elaborated-enum-base" ./configure --with-CoreFoundation-includes="$(gnustep-config --variable=GNUSTEP_LOCAL_HEADERS)" --with-CoreFoundation-libs="$(gnustep-config --variable=GNUSTEP_LOCAL_LIBRARIES)"
-```
-
-#### Problems
-
-##### CFFileDescriptor
-
-[Apple's documentation](https://developer.apple.com/documentation/corefoundation/cffiledescriptor?language=objc)
-
-Need (without c-ares):
-* `CFFileDescriptorRef`
-* `CFFileDescriptorEnableCallBacks`
-* `kCFFileDescriptorReadCallBack`
-* `kCFFileDescriptorWriteCallBack`
-* `CFFileDescriptorNativeDescriptor`
-* `CFFileDescriptorGetNativeDescriptor`
-* `CFFileDescriptorContext`
-* `CFFileDescriptorCreate`
-
-We solved this in our CoreFoundation port.
