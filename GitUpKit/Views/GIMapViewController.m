@@ -528,11 +528,14 @@
     }
   }
 
+  // FIXME:GNUSTEP: Support -[NSMenuItem setHidden:]
+  #if !GNUSTEP
   if (_contextualMenu.numberOfItems > (index + 1)) {
     _separatorMenuItem.hidden = NO;
   } else {
     _separatorMenuItem.hidden = YES;
   }
+  #endif
 
   return _contextualMenu;
 }

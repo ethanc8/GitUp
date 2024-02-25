@@ -64,13 +64,13 @@ libGitUpKit_OBJC_FILES = \
 	Components/GICommitListViewController.m Components/GIDiffContentsViewController.m \
 	Components/GIDiffFilesViewController.m Components/GISnapshotListViewController.m \
 	Components/GIUnifiedReflogViewController.m \
-	# \
-	# Views/GIAdvancedCommitViewController.m Views/GICommitRewriterViewController.m \
-	# Views/GICommitSplitterViewController.m Views/GICommitViewController.m \
-	# Views/GIConfigViewController.m Views/GIConflictResolverViewController.m \
-	# Views/GIDiffViewController.m Views/GIMapViewController.m \
-	# Views/GIMapViewController+Operations.m Views/GIQuickViewController.m \
-	# Views/GISimpleCommitViewController.m Views/GIStashListViewController.m \
+	\
+	Views/GIAdvancedCommitViewController.m Views/GICommitRewriterViewController.m \
+	Views/GICommitSplitterViewController.m Views/GICommitViewController.m \
+	Views/GIConfigViewController.m Views/GIConflictResolverViewController.m \
+	Views/GIDiffViewController.m Views/GIMapViewController.m \
+	Views/GIMapViewController+Operations.m Views/GIQuickViewController.m \
+	Views/GISimpleCommitViewController.m Views/GIStashListViewController.m \
 	# \
 	## Requires NSTableCellView: \
 	
