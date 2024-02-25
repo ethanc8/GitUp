@@ -4,30 +4,26 @@ LIBRARY_NAME = libGitUpKit
 libGitUpKit_HEADER_FILES = \
 	GitUpKit.h \
 	\
-	GCBranch.h GCCommitDatabase.h GCCommit.h GCCore.h GCDiff.h \
-	GCError.h GCFoundation.h GCFunctions.h GCHistory.h GCIndex.h \
-	GCLiveRepository.h GCMacros.h GCGitObject.h GCOrderedSet.h \
-	GCReference.h GCReferenceTransform.h GCReflogMessages.h GCRemote.h \
-	GCRepository+Bare.h GCRepository+Config.h GCRepository.h GCRepository+HEAD.h \
-	GCRepository+Mock.h GCRepository+Reflog.h GCRepository+Reset.h \
-	GCRepository+Status.h GCSnapshot.h GCSQLiteRepository.h GCStash.h \
-	GCSubmodule.h GCTag.h \
+	GCBranch.h GCCommitDatabase.h GCCommit.h GCCore.h GCDiff.h GCError.h GCFoundation.h GCFunctions.h \
+	GCGitObject.h GCHistory.h GCHistory+Rewrite.h GCIndex.h GCLiveRepository.h GCLiveRepository+Utilities.h \
+	GCMacros.h GCObject.h GCOrderedSet.h GCPrivate.h GCReference.h GCReferenceTransform.h GCReflogMessages.h \
+	GCRemote.h GCRepository+Bare.h GCRepository+Config.h GCRepository.h GCRepository+HEAD.h GCRepository+Index.h \
+	GCRepository+Mock.h GCRepository+Reflog.h GCRepository+Reset.h GCRepository+Status.h GCRepository+Utilities.h \
+	GCSnapshot.h GCSQLiteRepository.h GCStash.h GCSubmodule.h GCTag.h GCTestCase.h \
 	\
 	XLFacilityMacros.h \
 	\
-	GCHistory+Rewrite.h GCLiveRepository+Utilities.h \
-	GCRepository+Index.h GCRepository+Utilities.h \
-	\
-	GIBranch.h GIConstants.h GIDiffView.h GIFunctions.h GIGraph.h GIGraphView.h \
-	GIInterface.h GILayer.h GILine.h GINode.h GIPrivate.h \
-	GISplitDiffView.h GIUnifiedDiffView.h \
-	\
 	NSColor+GINamedColors.h \
 	\
-	GIAppKit.h GIColorView.h GICustomToolbarItem.h GILaunchServicesLocator.h \
-	GILinkButton.h GIViewController.h GIViewController+Utilities.h \
-	NSBundle+GitUpKit.h NSColor+GINamedColors.h \
-	GIWindowController.h GIModalView.h GIImageDiffView.h
+	GIAdvancedCommitViewController.h GIAppKit.h GIBranch.h GIColorView.h GICommitListViewController.h \
+	GICommitRewriterViewController.h GICommitSplitterViewController.h GICommitViewController.h GIConfigViewController.h \
+	GIConflictResolverViewController.h GIConstants.h GICustomToolbarItem.h GIDiffContentsViewController.h \
+	GIDiffFilesViewController.h GIDiffViewController.h GIDiffView.h GIFunctions.h GIGraph.h GIGraphView.h \
+	GIImageDiffView.h GIInterface.h GILaunchServicesLocator.h GILayer.h GILine.h GILinkButton.h GIMapViewController.h \
+	GIMapViewController+Operations.h GIModalView.h GINode.h GIPrivate.h GIQuickViewController.h \
+	GISimpleCommitViewController.h GISnapshotListViewController.h GISplitDiffView.h GIStashListViewController.h \
+	GIUnifiedDiffView.h GIUnifiedReflogViewController.h GIViewController.h GIViewController+Utilities.h \
+	GIWindowController.h
 
 # Interface/GIImageDiffView.m Utilities/GIModalView.m Utilities/GIWindowController.m requires CAAppKitBridge.
 libGitUpKit_OBJC_FILES = \
