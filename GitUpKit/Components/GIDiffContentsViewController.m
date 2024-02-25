@@ -342,9 +342,13 @@ static NSImage* _untrackedImage = nil;
             XLOG_DEBUG_CHECK(!isBinary || patch.empty);
 
             CFStringRef fileExtension = (__bridge CFStringRef)delta.canonicalPath.pathExtension;
+            #if GNUSTEP
+            BOOL isImage = [NSImage.imageFileTypes containsObject:(__bridge NSString*)fileExtension];
+            #else
             CFStringRef fileUTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension, NULL);
             BOOL isImage = [NSImage.imageTypes containsObject:(__bridge NSString*)(fileUTI)];
             CFRelease(fileUTI);
+            #endif
             if (isImage) {
               GIImageDiffView* imageDiffView = [[GIImageDiffView alloc] initWithRepository:self.repository];
               imageDiffView.delta = delta;
@@ -450,22 +454,22 @@ static NSImage* _untrackedImage = nil;
   return row % 2 == 0;
 }
 
-- (void)tableView:(NSTableView*)tableView didRemoveRowView:(NSTableRowView*)rowView forRow:(NSInteger)row {
-  if (_headerView) {
-    row -= 1;
-  }
-  if (row % 2) {
-    GITextDiffCellView* textDiffView = [rowView viewAtColumn:0];
-    GIImageDiffCellView* imageDiffView = [rowView viewAtColumn:0];
-    if ([textDiffView isKindOfClass:[GITextDiffCellView class]]) {
-      [textDiffView.diffView removeFromSuperview];
-      textDiffView.diffView = nil;
-    } else if ([imageDiffView isKindOfClass:[GIImageDiffCellView class]]) {
-      [imageDiffView.imageDiffView removeFromSuperview];
-      imageDiffView.imageDiffView = nil;
-    }
-  }
-}
+// - (void)tableView:(NSTableView*)tableView didRemoveRowView:(NSTableRowView*)rowView forRow:(NSInteger)row {
+//   if (_headerView) {
+//     row -= 1;
+//   }
+//   if (row % 2) {
+//     GITextDiffCellView* textDiffView = [rowView viewAtColumn:0];
+//     GIImageDiffCellView* imageDiffView = [rowView viewAtColumn:0];
+//     if ([textDiffView isKindOfClass:[GITextDiffCellView class]]) {
+//       [textDiffView.diffView removeFromSuperview];
+//       textDiffView.diffView = nil;
+//     } else if ([imageDiffView isKindOfClass:[GIImageDiffCellView class]]) {
+//       [imageDiffView.imageDiffView removeFromSuperview];
+//       imageDiffView.imageDiffView = nil;
+//     }
+//   }
+// }
 
 static inline NSString* _StringFromFileMode(GCFileMode mode) {
   switch (mode) {
@@ -684,7 +688,7 @@ static inline NSString* _StringFromFileMode(GCFileMode mode) {
     if (data.diffView == view) {
       GIHeaderDiffCellView* headerView = [_tableView viewAtColumn:0 row:row makeIfNecessary:NO];
       if (headerView) {
-        if (!headerView.actionButton.hidden) {
+        if (!headerView.actionButton.isHidden) {
           [headerView setActionButtonLabel:[_delegate diffContentsViewController:self actionButtonLabelForDelta:data.delta conflict:data.conflict]];
         }
       } else {

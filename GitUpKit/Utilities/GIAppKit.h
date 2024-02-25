@@ -14,6 +14,10 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #import <AppKit/AppKit.h>
+#if GNUSTEP
+#import <LaunchServices/LaunchServices.h>
+#import <EJCAsset/libEJCAsset.h>
+#endif
 
 typedef NS_ENUM(NSUInteger, GIAlertType) {
   kGIAlertType_Note = 0,
@@ -76,3 +80,9 @@ FOUNDATION_EXPORT void GIPerformOnMainRunLoop(dispatch_block_t block);
 @interface NSAppearance (GIAppearance)
 @property(nonatomic, readonly) BOOL matchesDarkAppearance;
 @end
+
+#if GNUSTEP
+// FIXME: Implement this API in GNUstep
+@protocol NSFilePromiseProviderDelegate
+@end
+#endif

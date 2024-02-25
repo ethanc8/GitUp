@@ -39,10 +39,12 @@ static const NSPasteboardType GIPasteboardTypeFileURL = @"public.file-url";
 @end
 
 /// Allows augmenting a file promise with custom intra-app data.
+#if !GNUSTEP
 API_AVAILABLE(macos(10.12))
 @interface GIDiffFileProvider : NSFilePromiseProvider
 @property(strong) id<NSPasteboardWriting> overridePasteboardWriter;
 @end
+#endif
 
 @implementation GIFileCellView
 @end
@@ -176,6 +178,8 @@ static NSImage* _untrackedImage = nil;
 
 - (IBAction)copy:(id)sender {
   NSMutableArray* objects = [NSMutableArray array];
+  // FIXME: Implement the 10.6 pasteboard API in GNUstep
+  #if !GNUSTEP
   [_tableView.selectedRowIndexes enumerateIndexesUsingBlock:^(NSUInteger index, BOOL* stop) {
     id<NSPasteboardWriting> pasteboardWriter = [self tableView:_tableView pasteboardWriterForRow:index];
     if (!pasteboardWriter) {
@@ -183,8 +187,10 @@ static NSImage* _untrackedImage = nil;
     }
     [objects addObject:pasteboardWriter];
   }];
+  
   [[NSPasteboard generalPasteboard] clearContents];
   [[NSPasteboard generalPasteboard] writeObjects:objects];
+  #endif
 }
 
 - (IBAction)doubleClick:(id)sender {
@@ -199,6 +205,8 @@ static NSImage* _untrackedImage = nil;
   return self.items.count;
 }
 
+// FIXME: Implement the new NSPasteboard API in GNUstep
+#if !GNUSTEP
 - (id<NSPasteboardWriting>)tableView:(NSTableView*)tableView pasteboardWriterForRow:(NSInteger)row {
   GCDiffDelta* delta = self.items[row];
 
@@ -260,6 +268,7 @@ static NSImage* _untrackedImage = nil;
   NSArray* deltas = [source.controller.items objectsAtIndexes:indexes];
   return [self.delegate diffFilesViewController:self didReceiveDeltas:deltas fromOtherController:source.controller];
 }
+#endif
 
 #pragma mark - NSTableViewDelegate
 
@@ -319,6 +328,8 @@ static NSImage* _untrackedImage = nil;
   }
 }
 
+// FIXME: Implement the new drag-and-drop API in GNUstep
+#if !GNUSTEP
 #pragma mark - NSFilePromiseProviderDelegate
 
 - (NSString*)_SHA1ForDelta:(GCDiffDelta*)delta {
@@ -355,9 +366,12 @@ static NSImage* _untrackedImage = nil;
   BOOL success = [delta.diff.repository exportBlobWithSHA1:SHA1 toPath:url.path error:&error];
   completionHandler(success ? nil : error);
 }
+#endif
 
 @end
 
+// FIXME: Implement the new drag-and-drop API in GNUstep
+#if !GNUSTEP
 @implementation GIDiffFileProvider
 
 - (NSArray<NSPasteboardType>*)writableTypesForPasteboard:(NSPasteboard*)pasteboard {
@@ -373,3 +387,4 @@ static NSImage* _untrackedImage = nil;
 }
 
 @end
+#endif

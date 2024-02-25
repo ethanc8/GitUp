@@ -268,7 +268,10 @@ static NSString* _StringFromActions(GCReflogActions actions) {
   alert.type = kGIAlertType_Note;
   alert.messageText = NSLocalizedString(@"Create New Branch for Reflog Entry", nil);
   alert.informativeText = NSLocalizedString(@"This will create and checkout a new local branch at the commit of the selected reflog entry, making it reachable again.", nil);
+  // FIXME:GNUSTEP: Support NSAlert accessory view
+  #if !GNUSTEP
   alert.accessoryView = _restoreView;
+  #endif
   [alert addButtonWithTitle:NSLocalizedString(@"Create Branch", nil)];
   [alert addButtonWithTitle:NSLocalizedString(@"Cancel", nil)];
   [self presentAlert:alert

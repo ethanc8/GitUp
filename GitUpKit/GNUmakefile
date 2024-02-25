@@ -27,7 +27,7 @@ libGitUpKit_HEADER_FILES = \
 	GIAppKit.h GIColorView.h GICustomToolbarItem.h GILaunchServicesLocator.h \
 	GILinkButton.h GIViewController.h GIViewController+Utilities.h \
 	NSBundle+GitUpKit.h NSColor+GINamedColors.h \
-	# GIWindowController.h GIModalView.h GIImageDiffView.h
+	GIWindowController.h GIModalView.h GIImageDiffView.h
 
 # Interface/GIImageDiffView.m Utilities/GIModalView.m Utilities/GIWindowController.m requires CAAppKitBridge.
 libGitUpKit_OBJC_FILES = \
@@ -61,6 +61,9 @@ libGitUpKit_OBJC_FILES = \
 	Utilities/GIViewController.m Utilities/GIViewController+Utilities.m \
 	Utilities/NSBundle+GitUpKit.m \
 	Utilities/NSColor+GINamedColors.m \
+	Components/GICommitListViewController.m Components/GIDiffContentsViewController.m \
+	Components/GIDiffFilesViewController.m Components/GISnapshotListViewController.m \
+	Components/GIUnifiedReflogViewController.m \
 	# \
 	# Views/GIAdvancedCommitViewController.m Views/GICommitRewriterViewController.m \
 	# Views/GICommitSplitterViewController.m Views/GICommitViewController.m \
@@ -70,9 +73,7 @@ libGitUpKit_OBJC_FILES = \
 	# Views/GISimpleCommitViewController.m Views/GIStashListViewController.m \
 	# \
 	## Requires NSTableCellView: \
-	# Components/GICommitListViewController.m Components/GIDiffContentsViewController.m \
-	# Components/GIDiffFilesViewController.m Components/GISnapshotListViewController.m \
-	# Components/GIUnifiedReflogViewController.m \
+	
 
 libGitUpKit_INCLUDE_DIRS += -IHeaders -IHeaders/GitUpKit
 libGitUpKit_HEADER_FILES_DIR = Headers/GitUpKit
