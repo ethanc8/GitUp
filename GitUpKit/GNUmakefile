@@ -46,14 +46,15 @@ libGitUpKit_OBJC_FILES = \
 	\
 	Interface/GIBranch.m Interface/GIDiffView.m Interface/GIFunctions.m \
 	Interface/GIGraph.m Interface/GIGraphView.m \
+	Interface/GIImageDiffView.m \
 	Interface/GILayer.m Interface/GILine.m Interface/GINode.m \
 	Interface/GIPrivate.m Interface/GISplitDiffView.m Interface/GIUnifiedDiffView.m \
 	\
 	Utilities/NSColor+GINamedColors.m \
 	\
-	\
 	Utilities/GIAppKit.m Utilities/GIColorView.m Utilities/GICustomToolbarItem.m \
 	Utilities/GILaunchServicesLocator.m Utilities/GILinkButton.m \
+	Utilities/GIModalView.m \
 	Utilities/GIViewController.m Utilities/GIViewController+Utilities.m \
 	Utilities/GIWindowController.m \
 	Utilities/NSBundle+GitUpKit.m \

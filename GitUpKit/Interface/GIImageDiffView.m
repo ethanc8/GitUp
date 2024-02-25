@@ -1,3 +1,5 @@
+#include "AppKit/NSBitmapImageRep.h"
+#include "CoreFoundation/CFBase.h"
 #if !__has_feature(objc_arc)
 #error This file requires ARC
 #endif
@@ -5,7 +7,20 @@
 #import "GIPrivate.h"
 #import "GILaunchServicesLocator.h"
 #import <QuartzCore/CATransaction.h>
+// ImageIO is part of CoreGraphics on GNUstep and macOS < 10.8.
+#if TARGET_OS_MAC
 #import <ImageIO/ImageIO.h>
+#else
+#import <CoreGraphics/CoreGraphics.h>
+#import <QuartzCore/QuartzCore.h>
+#ifndef CGFLOAT_EPSILON
+    #if CGFLOAT_IS_DOUBLE
+        #define CGFLOAT_EPSILON DBL_EPSILON
+    #else
+        #define CGFLOAT_EPSILON FLT_EPSILON
+    #endif
+#endif
+#endif
 
 #define kImageInset 10
 #define kBorderWidth 8
@@ -41,6 +56,8 @@
 }
 
 - (void)setupView {
+  // FIXME:GNUSTEP: Implement CAAppKitBridge
+  #if TARGET_OS_MAC
   self.wantsLayer = true;
 
   _oldImageBorderLayer = [[CALayer alloc] init];
@@ -69,6 +86,7 @@
   _currentImageMaskLayer.backgroundColor = NSColor.blackColor.CGColor;
   _currentImageView.wantsLayer = true;
   _currentImageView.layer.mask = _currentImageMaskLayer;
+  #endif
 
   _dividerView = [[NSView alloc] init];
   [self addSubview:_dividerView];
@@ -79,10 +97,13 @@
   [_progressIndicator startAnimation:self];
   _progressIndicator.hidden = true;
 
+  // FIXME:GNUSTEP: Implement the gesture recognizers
+  #if TARGET_OS_MAC
   _panGestureRecognizer = [[NSPanGestureRecognizer alloc] initWithTarget:self action:@selector(didMoveSplit:)];
   _clickGestureRecognizer = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(didMoveSplit:)];
   [self addGestureRecognizer:_panGestureRecognizer];
   [self addGestureRecognizer:_clickGestureRecognizer];
+  #endif
 }
 
 - (void)setDelta:(GCDiffDelta*)delta {
@@ -158,14 +179,14 @@
   CGFloat height = 0.0f;
 
   if (isPDF) {
-    CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((CFURLRef)imageFileURL);
+    CGPDFDocumentRef document = CGPDFDocumentCreateWithURL((CFURLRef)CFBridgingRetain(imageFileURL));
     CGPDFPageRef page = CGPDFDocumentGetPage(document, 1);
     CGRect mediaBox = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
     width = mediaBox.size.width;
     height = mediaBox.size.height;
     CGPDFDocumentRelease(document);
   } else {
-    CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)imageFileURL, NULL);
+    CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)CFBridgingRetain(imageFileURL), NULL);
     if (imageSource == NULL) {
       return NSZeroSize;
     }
@@ -199,7 +220,7 @@
 }
 
 - (NSImage*)generateLimitedSizeImageFromPath:(NSString*)path {
-  CGImageSourceRef imageSource = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:path], NULL);
+  CGImageSourceRef imageSource = CGImageSourceCreateWithURL((__bridge CFURLRef)[NSURL fileURLWithPath:path], NULL);
   if (!imageSource) {
     return nil;
   }
@@ -210,7 +231,16 @@
     (id)kCGImageSourceThumbnailMaxPixelSize : @(kMaxImageDimension)
   });
   CGImageRef image = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options);
+  // FIXME:GNUSTEP: Implement a method to do the conversion from CGImage
+  #if TARGET_OS_MAC
   NSImage* convertedImage = [[NSImage alloc] initWithCGImage:image size:NSZeroSize];
+  #else
+  // See QA1509 (https://developer.apple.com/library/archive/qa/qa1509/_index.html)
+  CFDataRef imageData = CGDataProviderCopyData(CGImageGetDataProvider(image));
+  NSBitmapImageRep* imageRep = [[NSBitmapImageRep alloc] initWithData: (__bridge NSData*)imageData];
+  NSImage *convertedImage = [[NSImage alloc] init];
+  [convertedImage addRepresentation:imageRep];
+  #endif
 
   CGImageRelease(image);
   CFRelease(options);
@@ -233,10 +263,13 @@
 }
 
 - (void)updateColors {
+  // FIXME:GNUSTEP: Implement CAAppKitBridge
+  #if TARGET_OS_MAC
   _oldImageBorderLayer.backgroundColor = NSColor.gitUpDiffDeletedTextHighlightColor.CGColor;
   _currentImageBorderLayer.backgroundColor = NSColor.gitUpDiffAddedTextHighlightColor.CGColor;
   _dividerView.layer.backgroundColor = NSColor.gitUpDiffModifiedBackgroundColor.CGColor;
   _transparencyCheckerboardLayer.backgroundColor = _checkerboardColor.CGColor;
+  #endif
 }
 
 - (void)updateFrames {

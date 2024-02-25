@@ -18,7 +18,9 @@
 #endif
 
 #import <QuartzCore/QuartzCore.h>
+#if TARGET_OS_MAC
 #import <sys/sysctl.h>
+#endif
 
 #import "GIModalView.h"
 
@@ -40,7 +42,10 @@
 
 // See https://developer.apple.com/library/mac/documentation/GraphicsImaging/Reference/CoreImageFilterReference/index.html
 - (void)_initialize {
+  // FIXME:GNUSTEP: Implement CAAppKitBridge
+  #if TARGET_OS_MAC
   self.wantsLayer = YES;
+  #endif
 
 #if __ENABLE_BLUR__
   size_t size;
@@ -85,9 +90,12 @@
   NSRect frame = view.frame;
   view.frame = NSMakeRect(round((bounds.size.width - frame.size.width) / 2), round((bounds.size.height - frame.size.height) / 2), frame.size.width, frame.size.height);
   view.autoresizingMask = NSViewMinXMargin | NSViewMaxXMargin | NSViewMinYMargin | NSViewMaxYMargin;
+  // FIXME:GNUSTEP: Implement CAAppKitBridge
+  #if TARGET_OS_MAC
   view.wantsLayer = YES;
   view.layer.borderWidth = 1.0;
   view.layer.cornerRadius = 5.0;
+  #endif
 
 #if __ENABLE_BLUR__
   if (_useBackgroundFilters) {
@@ -150,8 +158,11 @@
 #endif
   {
     [view removeFromSuperviewWithoutNeedingDisplay];
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if TARGET_OS_MAC
     view.wantsLayer = NO;
     self.layer.backgroundColor = nil;
+    #endif
     if (handler) {
       dispatch_async(dispatch_get_main_queue(), handler);
     }
@@ -164,15 +175,21 @@
     return;
   }
 
+  // FIXME:GNUSTEP: Implement CAAppKitBridge
+  #if TARGET_OS_MAC
   view.layer.borderColor = NSColor.gitUpSeparatorColor.CGColor;
+  #endif
 
 #if __ENABLE_BLUR__
   if (!_useBackgroundFilters)
 #endif
   {
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if TARGET_OS_MAC
     view.layer.backgroundColor = NSColor.windowBackgroundColor.CGColor;
     // This is for dimming so deliberately does not adapt for dark mode.
     self.layer.backgroundColor = [[NSColor colorWithDeviceRed:0.0 green:0.0 blue:0.0 alpha:0.4] CGColor];
+    #endif
   }
 }
 
