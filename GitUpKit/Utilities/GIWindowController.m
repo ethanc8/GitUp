@@ -187,14 +187,21 @@ static void _TimerCallBack(CFRunLoopTimerRef timer, void* info) {
     XLOG_DEBUG_CHECK(_overlayView);
 
     // Force a dark appearance of the overlay. Set in the nib for 10.14.
+    // FIXME:GNUSTEP: Implement these methods
+    #if TARGET_OS_MAC
     if (@available(macOS 10.14, *)) {
     } else {
       _overlayTextField.textColor = NSColor.whiteColor;
       _overlayCloseButton.cell.backgroundStyle = NSBackgroundStyleEmphasized;
     }
+    #endif
 
     _area = [[NSTrackingArea alloc] initWithRect:NSZeroRect options:(NSTrackingInVisibleRect | NSTrackingActiveAlways | NSTrackingMouseEnteredAndExited) owner:self userInfo:nil];
+    
+    // FIXME:GNUSTEP: Implement tracking areas
+    #if TARGET_OS_MAC
     [_overlayView addTrackingArea:_area];
+    #endif
 
     _modalView = [[GIModalView alloc] initWithFrame:NSZeroRect];
     _modalView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
@@ -253,22 +260,34 @@ static void _TimerCallBack(CFRunLoopTimerRef timer, void* info) {
     _overlayTextField.stringValue = message;
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:kOverlayAnimationInDuration];
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if !GNUSTEP
     [[NSAnimationContext currentContext] setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
     [_overlayView.animator setHidden:NO];
+    #endif
     [NSAnimationContext endGrouping];
   } else {
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:kOverlayAnimationInDuration];
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if !GNUSTEP
     [[NSAnimationContext currentContext] setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseIn]];
+    #endif
     [[NSAnimationContext currentContext] setCompletionHandler:^{
       _overlayTextField.stringValue = message;
       [NSAnimationContext beginGrouping];
       [[NSAnimationContext currentContext] setDuration:kOverlayAnimationInDuration];
+      // FIXME:GNUSTEP: Implement CAAppKitBridge
+      #if !GNUSTEP
       [[NSAnimationContext currentContext] setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
       [_overlayTextField.animator setAlphaValue:1.0];
+      #endif
       [NSAnimationContext endGrouping];
     }];
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if !GNUSTEP
     [_overlayTextField.animator setAlphaValue:0.0];
+    #endif
     [NSAnimationContext endGrouping];
   }
 
@@ -282,11 +301,17 @@ static void _TimerCallBack(CFRunLoopTimerRef timer, void* info) {
 
     [NSAnimationContext beginGrouping];
     [[NSAnimationContext currentContext] setDuration:kOverlayAnimationOutDuration];
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if !GNUSTEP
     [[NSAnimationContext currentContext] setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut]];
+    #endif
     [[NSAnimationContext currentContext] setCompletionHandler:^{
       [_overlayView removeFromSuperview];
     }];
+    // FIXME:GNUSTEP: Implement CAAppKitBridge
+    #if !GNUSTEP
     [_overlayView.animator setFrame:newFrame];
+    #endif
     [NSAnimationContext endGrouping];
 
     CFRunLoopTimerSetNextFireDate(_overlayTimer, HUGE_VALF);
@@ -300,19 +325,29 @@ static void _TimerCallBack(CFRunLoopTimerRef timer, void* info) {
 }
 
 - (void)mouseEntered:(NSEvent*)event {
+  // FIXME:GNUSTEP: Implement tracking areas
+  #if TARGET_OS_MAC
   if (event.trackingArea == _area) {
     CFRunLoopTimerSetNextFireDate(_overlayTimer, HUGE_VALF);
   } else {
     [super mouseEntered:event];
   }
+  #else
+  [super mouseEntered:event];
+  #endif
 }
 
 - (void)mouseExited:(NSEvent*)event {
+  // FIXME:GNUSTEP: Implement tracking areas
+  #if TARGET_OS_MAC
   if (event.trackingArea == _area) {
     CFRunLoopTimerSetNextFireDate(_overlayTimer, CFAbsoluteTimeGetCurrent() + _overlayDelay);
   } else {
     [super mouseExited:event];
   }
+  #else
+  [super mouseExited:event];
+  #endif
 }
 
 - (GIModalView*)modalViewIfVisible {

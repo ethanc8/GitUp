@@ -55,6 +55,7 @@ libGitUpKit_OBJC_FILES = \
 	Utilities/GIAppKit.m Utilities/GIColorView.m Utilities/GICustomToolbarItem.m \
 	Utilities/GILaunchServicesLocator.m Utilities/GILinkButton.m \
 	Utilities/GIViewController.m Utilities/GIViewController+Utilities.m \
+	Utilities/GIWindowController.m \
 	Utilities/NSBundle+GitUpKit.m \
 	Utilities/NSColor+GINamedColors.m \
 	Components/GICommitListViewController.m Components/GIDiffContentsViewController.m \
