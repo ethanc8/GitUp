@@ -12,3 +12,4 @@ Xcode-Configurations/DEVELOPMENT_TEAM.xcconfig
 **/*Tests.bundle
 .vscode/*
 **/GitUpKit/Versions
+**/*.app

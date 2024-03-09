@@ -79,7 +79,7 @@ libGitUpKit_HEADER_FILES_INSTALL_DIR = GitUpKit
 
 libGitUpKit_OBJCFLAGS = -D_GNU_SOURCE= -DDEBUG=1
 
-libGitUpKit_LIBRARIES_DEPEND_UPON = -lEJCAsset
+libGitUpKit_LIBRARIES_DEPEND_UPON = -lEJCAsset -lgnustep-boron -lopal -lQuartzCore
 
 # FIXME: These warnings should be enabled, but we don't want to see
 #        so many warnings that we can't see the other warnings.
@@ -100,7 +100,7 @@ Interface/GILine.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 Interface/GINode.m_FILE_FILTER_OUT_FLAGS = -fobjc-arc
 
 # libgit2
-libGitUpKit_LIBRARIES_DEPEND_UPON = -lGitUpKitGit2 -lCoreFoundation
+libGitUpKit_LIBRARIES_DEPEND_UPON += -lGitUpKitGit2 -lCoreFoundation
 libGitUpKit_INCLUDE_DIRS += -I$(GNUSTEP_LOCAL_HEADERS)/GitUpKitGit2 
 
 # sqlite3

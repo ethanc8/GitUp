@@ -333,8 +333,12 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
 
 @end
 
-// TODO - Fix on GNUstep
-#if TARGET_OS_MAC
+// FIXME:GNUSTEP:
+#if GNUSTEP
+@protocol NSLayoutManagerDelegate
+@end
+#endif
+
 @interface GILayoutManager () <NSLayoutManagerDelegate>
 @end
 
@@ -349,6 +353,8 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
   return self;
 }
 
+// FIXME:GNUSTEP:
+#if TARGET_OS_MAC
 - (NSUInteger)layoutManager:(NSLayoutManager*)layoutManager shouldGenerateGlyphs:(const CGGlyph*)glyphs properties:(const NSGlyphProperty*)props characterIndexes:(const NSUInteger*)charIndexes font:(NSFont*)aFont forGlyphRange:(NSRange)glyphRange {
   XLOG_DEBUG_CHECK([aFont.fontName isEqualToString:@"Menlo-Regular"]);
 
@@ -399,9 +405,8 @@ void GIPerformOnMainRunLoop(dispatch_block_t block) {
 
   return action;
 }
-
-@end
 #endif
+@end
 
 @implementation GIDualSplitView
 
