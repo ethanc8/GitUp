@@ -79,7 +79,7 @@ libGitUpKit_HEADER_FILES_INSTALL_DIR = GitUpKit
 
 libGitUpKit_OBJCFLAGS = -D_GNU_SOURCE= -DDEBUG=1
 
-libGitUpKit_LIBRARIES_DEPEND_UPON = -lEJCAsset -lgnustep-boron -lopal -lQuartzCore
+libGitUpKit_LIBRARIES_DEPEND_UPON = -lEJCAsset -lgnustep-boron -lopal -lQuartzCore -lGL
 
 # FIXME: These warnings should be enabled, but we don't want to see
 #        so many warnings that we can't see the other warnings.
@@ -137,7 +137,7 @@ GitUpKitTests_LIB_DIRS = -Lobj
 include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/bundle.make
 
-obj/Resources/Interface.clr: $(wildcard Interface/Interface.xcasssets/**/*)
+obj/Resources/Interface.clr: $(wildcard Interface/Interface.xcassets/**/*)
 	mkdir -p obj/Resources
 	AssetCompiler ${PWD}/Interface/Interface.xcassets --outBundle ${PWD}/obj
 
