@@ -142,4 +142,4 @@ make && sudo -E make install
 
 ## Building the example apps
 
-The example apps are described in [the README](../README.md). The example apps can be found in [../Examples/](../Examples/) and can be built using `make && sudo -E make install`.
+The example apps are described in [the README](../README.md). The example apps can be found in [../Examples/](../Examples/) and can be built using `make`.
