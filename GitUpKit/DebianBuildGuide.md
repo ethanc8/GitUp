@@ -6,7 +6,7 @@
 wget https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
 sudo ./llvm.sh 18
-sudo apt install clang-18 clangd-18
+sudo apt install clang-18 clangd-18 lld-18 lldb-18 liblldb-18
 
 export KERNEL=`uname -s | sed "s/\-.*//g" | awk '{print(tolower($0))}'`
 echo "Begin setup for ${KERNEL}"
@@ -23,7 +23,7 @@ git clone https://github.com/gnustep/tools-scripts
 
 ./tools-scripts/install-dependencies-${KERNEL}
 
-./tools-scripts/clang-build clang-18 clang++-18
+./tools-scripts/clang-build clang-18 clang++-18 ld.lld-18
 
 ./tools-scripts/post-install-${KERNEL}
 
